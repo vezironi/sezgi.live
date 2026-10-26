@@ -10,20 +10,20 @@ Her gün herkesin aynı 5 algı oyununu oynadığı, üyeliksiz, Türkçe günl�
 ## Yerelde çalıştırma
 
 ```bash
-npm install
-npm run dev      # http://localhost:5173
-npm run build    # dist/ üretir
+pnpm install
+pnpm dev         # http://localhost:5173
+pnpm build       # dist/ üretir
 ```
 
-`npm run dev`, `/api/*` uçlarını da çalıştırır. Redis ortam değişkenleri yoksa bellek içi bir
+`pnpm dev`, `/api/*` uçlarını da çalıştırır. Redis ortam değişkenleri yoksa bellek içi bir
 Redis kullanılır (sunucu yeniden başlayınca skorlar sıfırlanır). Geliştirme sırasında herhangi bir
 oyunu tek başına açmak için tarayıcı konsolunda: `__go('intro', { id: 'ritim' })`.
 
 ## Vercel'e yayın
 
 1. Projeyi GitHub'a gönder.
-2. Vercel → **Add New → Project** → depoyu içe aktar. Framework otomatik "Vite" algılanır
-   (`vercel.json` hazır).
+2. Vercel → **Add New → Project** → depoyu içe aktar. Ayarlar `vercel.json`'da hazır
+   (Vite, pnpm 12.14.0 ile kurulum, Frankfurt bölgesi); ekranda bir şey değiştirme.
 3. Proje → **Storage → Marketplace → Upstash (Redis)** → bölge olarak **Frankfurt (eu-central-1)** seç, oluştur ve projeye bağla.
    (Fonksiyonlar `vercel.json` ile `fra1` bölgesine sabitlendi; ikisi aynı bölgede olunca istekler hızlı olur.)
    `KV_REST_API_URL` ve `KV_REST_API_TOKEN` ortam değişkenleri otomatik eklenir
