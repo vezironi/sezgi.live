@@ -4,7 +4,7 @@ import { $ } from './dom.js';
 import { themeButton, bindThemeButton } from './theme.js';
 import { UI, icon } from './icons.js';
 
-// progress: { set, scores } — günlük oyunda state.today(), antrenmanda antrenman oturumu.
+// progress: { set, scores } | günlük oyunda state.today(), antrenmanda antrenman oturumu.
 export function gameBar(progress, currentId) {
   const t = progress;
   const segs = t.set.map(id => {

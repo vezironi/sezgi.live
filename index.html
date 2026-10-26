@@ -3,22 +3,72 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>sezgi.live — Günlük algı oyunu</title>
-<meta name="description" content="Her gün 5 kısa algı oyunu: nokta tahmini, açı, ritim, renk ve daha fazlası. Skorunu paylaş, haftalık tabloda yüksel.">
+<title>sezgi.live | Günlük Algı Oyunu: Her Gün 5 Mini Oyun</title>
+<meta name="description" content="Her gün yeni 5 algı oyunu: nokta tahmini, açı, ritim, renk, zaman ve daha fazlası. Ücretsiz, üyeliksiz ve Türkçe. Skorunu paylaş, haftalık sıralamada yüksel.">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://sezgi.live/">
+<meta name="application-name" content="sezgi.live">
+<meta name="apple-mobile-web-app-title" content="sezgi.live">
 <meta name="theme-color" content="#f6f4ff" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#121119" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="tr_TR">
 <meta property="og:site_name" content="sezgi.live">
-<meta property="og:title" content="sezgi.live — Günlük algı oyunu">
-<meta property="og:description" content="Her gün 5 kısa algı oyunu. Skorunu paylaş, haftalık tabloda yüksel.">
+<meta property="og:title" content="sezgi.live | Günlük Algı Oyunu">
+<meta property="og:description" content="Her gün yeni 5 algı oyunu. Ücretsiz, üyeliksiz, Türkçe. Skorunu paylaş, haftalık sıralamada yüksel.">
 <meta property="og:url" content="https://sezgi.live/">
 <meta property="og:image" content="https://sezgi.live/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="sezgi.live logosu ve “Her gün 5 algı oyunu” yazısı">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="sezgi.live | Günlük Algı Oyunu">
+<meta name="twitter:description" content="Her gün yeni 5 algı oyunu. Ücretsiz, üyeliksiz, Türkçe.">
 <meta name="twitter:image" content="https://sezgi.live/og.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://sezgi.live/#website",
+      "url": "https://sezgi.live/",
+      "name": "sezgi.live",
+      "description": "Her gün yeni 5 algı oyunu sunan ücretsiz, üyeliksiz, Türkçe günlük oyun sitesi.",
+      "inLanguage": "tr-TR",
+      "publisher": { "@id": "https://sezgi.live/#organization" }
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://sezgi.live/#organization",
+      "name": "sezgi.live",
+      "url": "https://sezgi.live/",
+      "logo": { "@type": "ImageObject", "url": "https://sezgi.live/icon-512.png", "width": 512, "height": 512 }
+    },
+    {
+      "@type": "WebApplication",
+      "@id": "https://sezgi.live/#app",
+      "name": "sezgi.live",
+      "url": "https://sezgi.live/",
+      "description": "Günlük algı oyunu: her gün 8 oyunluk havuzdan seçilen 5 mini oyun. Nokta tahmini, açı, zaman, renk, ağırlık merkezi, yörünge, ritim ve oran oyunları. Herkes aynı soruları oynar; skorlar günlük ve haftalık sıralamaya girer.",
+      "applicationCategory": "GameApplication",
+      "applicationSubCategory": "Algı ve beyin oyunu",
+      "operatingSystem": "Tüm cihazlar (web tarayıcısı)",
+      "browserRequirements": "JavaScript gerektirir",
+      "inLanguage": "tr-TR",
+      "isAccessibleForFree": true,
+      "image": "https://sezgi.live/og.png",
+      "screenshot": "https://sezgi.live/og.png",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "TRY" },
+      "publisher": { "@id": "https://sezgi.live/#organization" }
+    }
+  ]
+}
+</script>
 <script>
   (function () { var t; try { t = localStorage.getItem('sezgi-tema'); } catch (e) {}
     if (t !== 'dark' && t !== 'light') t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -27,6 +77,23 @@
 </head>
 <body>
 <div class="app" id="app"></div>
+<footer class="about">
+  <h2>sezgi.live nedir?</h2>
+  <p>sezgi.live, algını ölçen ücretsiz ve Türkçe bir günlük oyun sitesidir. Her gün 8 oyunluk havuzdan 5 mini oyun seçilir ve o gün herkes aynı soruları oynar. Bir günü bitirmek 3-4 dakika sürer; yeni bulmaca Türkiye saatiyle gece yarısı gelir. Üyelik gerekmez.</p>
+  <h3>Oyunlar</h3>
+  <ul>
+    <li><b>Nokta:</b> Ekranda 2 saniye beliren noktaların sayısını tahmin et.</li>
+    <li><b>Açı:</b> İstenen açıyı tek hamlede kur.</li>
+    <li><b>Zaman:</b> Sayaç görmeden verilen süre geçince dur.</li>
+    <li><b>Renk:</b> 2 saniye gördüğün rengi yeniden bul.</li>
+    <li><b>Merkez:</b> Bir üçgenin ağırlık merkezine dokun.</li>
+    <li><b>Yörünge:</b> Havada kaybolan topun düşeceği yeri tahmin et.</li>
+    <li><b>Ritim:</b> Ses kesildikten sonra tempoyu koru.</li>
+    <li><b>Oran:</b> Bir çizgide istenen kesri cetvelsiz bul.</li>
+  </ul>
+  <h3>Puanlama ve sıralama</h3>
+  <p>Her oyun 100 puan üzerinden değerlendirilir; günün puanı 5 oyunun ortalamasıdır. Skorun günlük sıralamaya ve pazartesi sıfırlanan haftalık genel sıralamaya girer. Sonucunu emojili kısa bir metinle paylaşabilirsin.</p>
+</footer>
 <script type="module" src="/src/main.js"></script>
 </body>
 </html>

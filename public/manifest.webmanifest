@@ -1,0 +1,16 @@
+{
+  "name": "sezgi.live | Günlük Algı Oyunu",
+  "short_name": "sezgi.live",
+  "description": "Her gün yeni 5 algı oyunu. Ücretsiz, üyeliksiz, Türkçe.",
+  "lang": "tr-TR",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f6f4ff",
+  "theme_color": "#6c4cff",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -170,3 +170,14 @@
 :root[data-theme="dark"] .fb,
 :root[data-theme="dark"] .steps,
 :root[data-theme="dark"] .stage { box-shadow:inset 0 1px 0 rgba(255,255,255,.04); }
+
+/* Hakkında: statik, taranabilir tanıtım metni; uygulamanın altında (ekranın dışında) durur. Oyun sırasında gizli. */
+.about { max-width:800px; margin:0 auto; padding:28px 16px 48px; border-top:1.5px dashed var(--line); color:var(--muted); font-size:14px; line-height:1.6; font-weight:600; }
+.about h2 { margin:0 0 8px; font-size:20px; color:var(--fg); }
+.about h3 { margin:18px 0 6px; font-size:16px; color:var(--fg); font-family:"Baloo 2 Variable",sans-serif; }
+.about p { margin:0; }
+.about ul { margin:0; padding-left:18px; }
+.about b { color:var(--fg); }
+.app[data-screen="intro"] ~ .about,
+.app[data-screen="play"] ~ .about { display:none; }
+@media (min-width: 820px) { .about { padding-left:32px; padding-right:32px; } }

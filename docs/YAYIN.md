@@ -1,4 +1,4 @@
-# sezgi.live — Geliştirme ve Yayın
+# sezgi.live | Geliştirme ve Yayın
 
 Projeyi yerelde çalıştırma ve Vercel'e yayınlama notları. Tanıtım için ana dizindeki `README.md`'ye bakın.
 
