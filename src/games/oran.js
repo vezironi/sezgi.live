@@ -15,7 +15,7 @@ export function mount({ stage, puzzle, L, game, onAnswer }) {
       <line x1="${x1}" y1="${Y - 16}" x2="${x1}" y2="${Y + 16}" style="stroke:var(--fg)" stroke-width="4" stroke-linecap="round"/>
       <line x1="${x2}" y1="${Y - 16}" x2="${x2}" y2="${Y + 16}" style="stroke:var(--fg)" stroke-width="4" stroke-linecap="round"/>
       <circle cx="${SX}" cy="${Y}" r="9" fill="${game.gc}"/>
-      <text x="${Math.min(L.W - 50, Math.max(50, SX))}" y="${Y + 46}" text-anchor="middle" font-family="Baloo 2, Nunito, sans-serif" font-weight="700" font-size="17" fill="${game.gc}">başlangıç</text>`;
+      <text x="${Math.min(L.W - 50, Math.max(50, SX))}" y="${Y + 46}" text-anchor="middle" font-family="Baloo 2 Variable, Nunito Variable, sans-serif" font-weight="700" font-size="17" fill="${game.gc}">başlangıç</text>`;
     if (done) {
       s += `<line x1="${TX}" y1="${Y - 34}" x2="${TX}" y2="${Y + 34}" style="stroke:var(--ok)" stroke-width="4" stroke-dasharray="3 5" stroke-linecap="round"/>
         <circle cx="${TX}" cy="${Y - 38}" r="7" style="fill:var(--ok)"/>`;

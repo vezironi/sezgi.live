@@ -1,3 +1,5 @@
+import '@fontsource-variable/baloo-2';
+import '@fontsource-variable/nunito';
 import './styles/base.css';
 import './styles/screens.css';
 import './styles/games.css';
