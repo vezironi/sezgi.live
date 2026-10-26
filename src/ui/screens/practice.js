@@ -1,7 +1,7 @@
 // Antrenman sonucu: sıralamaya gönderilmez; günün resmi puanıyla yan yana gösterilir.
 import { GAMES } from '../../../shared/games.js';
 import { dayScore, rankFor } from '../../logic/scoring.js';
-import { ICONS } from '../icons.js';
+import { ICONS, UI, icon } from '../icons.js';
 import { $, gvars } from '../dom.js';
 import { topBar, bindTopBar } from '../topbar.js';
 
@@ -23,7 +23,7 @@ export function render(app, ctx) {
         <div class="gicon">${ICONS[id]}</div><div class="nm" style="width:72px">${GAMES[id].ad}</div>
         <div class="bar"><i style="width:${p.scores[id]}%"></i></div><div class="sc">${p.scores[id]}</div>
       </div>`).join('')}</div>
-    <div class="btnrow"><button class="btn" id="again">Tekrar oyna</button><button class="btn alt" id="home">Ana sayfa</button></div>`;
+    <div class="btnrow"><button class="btn" id="again">${icon(UI.replay)} Tekrar oyna</button><button class="btn alt" id="home">${icon(UI.home)} Ana sayfa</button></div>`;
 
   bindTopBar(ctx, 'practice');
   $('again').onclick = ctx.startPractice;

@@ -1,5 +1,6 @@
 import { later } from './common.js';
 import { REF_BEATS, FREE_BEATS } from '../logic/puzzles/ritim.js';
+import { UI, icon } from '../ui/icons.js';
 
 export const prompt = () => 'İlk <strong>4 vuruşu</strong> dinle ve eşlik et. Ses kesilince aynı tempoyla <strong>8 kez</strong> daha dokun.';
 
@@ -11,7 +12,7 @@ export function mount({ stage, puzzle, onAnswer, bag }) {
   const taps = [];
   stage.innerHTML = `<button class="timer-btn" id="b">Başlat</button>
     <div class="beats" id="bt">${'<i></i>'.repeat(FREE_BEATS)}</div>
-    <div class="hint" id="hn">🔊 Sesin açık olsun · Bilgisayarda boşluk tuşu da olur</div>`;
+    <div class="hint" id="hn">${icon(UI.sound, { size: 15, cls: 'inl' })} Sesin açık olsun · Bilgisayarda boşluk tuşu da olur</div>`;
   const b = stage.querySelector('#b'), dots = [...stage.querySelectorAll('#bt i')], hint = stage.querySelector('#hn');
   const pulse = cls => { b.classList.remove(cls); void b.offsetWidth; b.classList.add(cls); };
   const freeTaps = () => taps.filter(x => x > tStart + (REF_BEATS - 0.5) * I);

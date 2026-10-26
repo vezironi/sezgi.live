@@ -2,7 +2,7 @@ import { GAMES } from '../../../shared/games.js';
 import { PUZZLES } from '../../logic/puzzles/index.js';
 import { RENDERERS } from '../../games/index.js';
 import { layout } from '../../games/common.js';
-import { ICONS } from '../icons.js';
+import { ICONS, UI, icon } from '../icons.js';
 import { $, gvars } from '../dom.js';
 import { gameBar, bindGameBar } from '../gamebar.js';
 
@@ -46,7 +46,7 @@ export function render(app, ctx, { id, practice = false }) {
       if (practice) { session.finish(id, score); next = session.nextGame(); }
       else { state.finishGame(id, score); next = state.nextGame(); }
       $('fb').innerHTML = `<div class="fb"><div class="pts">${score}<small>puan</small></div><div class="tx">${html}</div></div>
-        <button class="btn" id="next">${next ? 'Devam →' : 'Sonucu gör'}</button>`;
+        <button class="btn" id="next">${next ? `Devam ${icon(UI.next)}` : 'Sonucu gör'}</button>`;
       $('next').onclick = () => {
         if (next) go('intro', { id: next, practice });
         else go(practice ? 'practice' : 'results');

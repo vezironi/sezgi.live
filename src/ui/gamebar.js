@@ -2,6 +2,7 @@
 import { GAMES } from '../../shared/games.js';
 import { $ } from './dom.js';
 import { themeButton, bindThemeButton } from './theme.js';
+import { UI, icon } from './icons.js';
 
 // progress: { set, scores } — günlük oyunda state.today(), antrenmanda antrenman oturumu.
 export function gameBar(progress, currentId) {
@@ -11,7 +12,7 @@ export function gameBar(progress, currentId) {
     if (id === currentId) return `<i style="background:${GAMES[id].gc};opacity:.45"></i>`;
     return '<i></i>';
   }).join('');
-  return `<div class="gbar"><button class="iconbtn" id="x" title="Çık" aria-label="Ana sayfaya dön">✕</button><div class="prog">${segs}</div>${themeButton()}</div>`;
+  return `<div class="gbar"><button class="iconbtn" id="x" title="Çık" aria-label="Ana sayfaya dön">${icon(UI.close)}</button><div class="prog">${segs}</div>${themeButton()}</div>`;
 }
 
 export function bindGameBar(state, onExit) {

@@ -1,11 +1,12 @@
 import { GAMES } from '../../../shared/games.js';
 import { puzzleNumber } from '../../../shared/date.js';
 import { getBoard, getMe } from '../../api.js';
-import { ICONS } from '../icons.js';
+import { ICONS, UI, icon } from '../icons.js';
 import { $, esc, gvars, nf } from '../dom.js';
 import { themeButton, bindThemeButton } from '../theme.js';
 
-const MEDALS = ['🥇', '🥈', '🥉'];
+const MEDAL_COLORS = ['#f5b301', '#9aa4b2', '#c9773b'];
+const rankCell = rank => (rank <= 3 ? `<span class="medal" style="color:${MEDAL_COLORS[rank - 1]}">${icon(UI.medal, { size: 22 })}</span>` : rank);
 const ME_TTL_MS = 60000;
 
 // "/api/me" yanıtı tüm sekmeleri kapsar: sekme değiştirirken yeniden istenmez.
@@ -36,7 +37,7 @@ export function render(app, ctx, { back = 'home', tab = 'day' } = {}) {
   const t = state.today(), id = state.identity();
   const isGame = tab !== 'day' && tab !== 'week';
 
-  app.innerHTML = `<div class="gbar"><button class="iconbtn" id="bk" title="Geri" aria-label="Geri">←</button>
+  app.innerHTML = `<div class="gbar"><button class="iconbtn" id="bk" title="Geri" aria-label="Geri">${icon(UI.back)}</button>
       <div class="lbtitle">Skor Tablosu</div><div class="sp"></div>
       ${id ? `<div class="pill" style="background:var(--surface2);color:var(--fg)">${esc(id.nick)}</div>` : ''}${themeButton()}</div>
     <div class="lbwrap">
@@ -62,7 +63,7 @@ export function render(app, ctx, { back = 'home', tab = 'day' } = {}) {
       if (!list.isConnected) return;
       $('sub').textContent = subtitle(tab, t.date, board.players);
       list.innerHTML = board.top.length
-        ? board.top.map(r => `<div class="lbrow ${r.rank <= 3 ? 'top' : ''}"><div class="rk">${MEDALS[r.rank - 1] ?? r.rank}</div><div class="nk">${esc(r.nick)}</div><div class="sc">${nf(r.score)}</div></div>`).join('')
+        ? board.top.map(r => `<div class="lbrow ${r.rank <= 3 ? 'top' : ''}"><div class="rk">${rankCell(r.rank)}</div><div class="nk">${esc(r.nick)}</div><div class="sc">${nf(r.score)}</div></div>`).join('')
         : '<div class="err">Henüz kimse yok. İlk sen ol!</div>';
       $('me').innerHTML = myRow(me, tab, state.isComplete());
     } catch {

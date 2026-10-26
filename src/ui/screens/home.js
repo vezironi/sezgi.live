@@ -1,7 +1,7 @@
 import { GAMES } from '../../../shared/games.js';
 import { puzzleNumber, formatLongDate, msUntilIstanbulMidnight, formatCountdown } from '../../../shared/date.js';
 import { dayScore, rankFor } from '../../logic/scoring.js';
-import { ICONS } from '../icons.js';
+import { ICONS, UI, icon } from '../icons.js';
 import { $, gvars } from '../dom.js';
 import { topBar, bindTopBar } from '../topbar.js';
 
@@ -31,7 +31,7 @@ export function render(app, ctx) {
     return `<div class="gcard ${done ? 'done' : ''}" style="${gvars(g)}">
       <div class="gicon">${ICONS[id]}</div>
       <div><div class="gname">${g.ad}</div><div class="gdesc">${g.ds}</div></div>
-      <div class="gnum ${done ? 'score' : ''}">${done ? '✓ ' + t.scores[id] : i + 1}</div>
+      <div class="gnum ${done ? 'score' : ''}">${done ? icon(UI.check, { size: 14, stroke: 2.6 }) + t.scores[id] : i + 1}</div>
     </div>`;
   }).join('');
 
@@ -40,7 +40,7 @@ export function render(app, ctx) {
         const day = dayScore(t.set.map(id => t.scores[id]));
         return `<div class="daycard"><div class="lbl">Bugünün puanın</div><div class="n">${day}</div><div class="lbl">/ 100</div><div class="rank">${rankFor(day)}</div></div>
           <button class="btn" id="go">Sonucu gör</button>
-          <button class="btn alt" id="again">Tekrar oyna</button>
+          <button class="btn alt" id="again">${icon(UI.replay)} Tekrar oyna</button>
           <div class="ft">Tekrar oynadıkların sıralamaya sayılmaz</div>`;
       })()
     : `<div class="games">${cards}</div>

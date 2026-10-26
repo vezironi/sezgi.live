@@ -1,4 +1,5 @@
 import { count321, later } from './common.js';
+import { UI, icon } from '../ui/icons.js';
 
 export const prompt = () => 'Noktalar <strong>2 saniye</strong> görünecek. Sayma, tahmin et!';
 
@@ -17,7 +18,7 @@ export function mount({ stage, below, puzzle, L, game, onAnswer, bag }) {
     draw();
     later(bag, () => {
       stage.innerHTML = '<div class="cnt" style="animation:none;font-size:90px;opacity:.25">?</div>';
-      below.innerHTML = `<form class="answer" id="fm"><input type="number" id="ans" placeholder="Kaç?" inputmode="numeric" autocomplete="off" aria-label="Kaç nokta gördün?"><button aria-label="Gönder">→</button></form>`;
+      below.innerHTML = `<form class="answer" id="fm"><input type="number" id="ans" placeholder="Kaç?" inputmode="numeric" autocomplete="off" aria-label="Kaç nokta gördün?"><button aria-label="Gönder">${icon(UI.next, { size: 28, stroke: 2.6 })}</button></form>`;
       const input = below.querySelector('#ans');
       input.focus();
       below.querySelector('#fm').onsubmit = e => {

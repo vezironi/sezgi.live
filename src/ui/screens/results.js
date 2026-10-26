@@ -1,23 +1,42 @@
 import { GAMES } from '../../../shared/games.js';
 import { dayScore, rankFor, shareText } from '../../logic/scoring.js';
 import { submitDay } from '../../submit.js';
-import { ICONS } from '../icons.js';
+import { ICONS, UI, icon } from '../icons.js';
 import { $, esc, gvars, nf } from '../dom.js';
 import { topBar, bindTopBar } from '../topbar.js';
 import { countdownFooter, startCountdown } from './home.js';
 
+// Skor gönderim kartı: gönderiliyor / gönderildi / hata durumları aynı kalıpta.
+function rankTile(node, color, value, label) {
+  return `<div class="rc-tile" style="--c:${color}"><span class="rc-ic">${icon(node, { size: 18, stroke: 2.4 })}</span><b>${value}</b><small>${label}</small></div>`;
+}
+
 function ranksCard(r) {
-  const cell = (label, value) => `<div><small>${label}</small><b>${value}</b></div>`;
-  return `<div class="subok">
-    <div>✓ <b>${esc(r.nick)}</b> olarak gönderildi</div>
-    <div class="two">
-      ${cell('Bugün', r.day ? `${nf(r.day.rank)}.` : '–')}
-      ${cell('Haftalık genel', r.week ? `${nf(r.week.rank)}.` : '–')}
-      ${cell('Hafta puanın', r.week ? nf(r.week.score) : '–')}
+  return `<div class="rcard">
+    <div class="rc-head">
+      <span class="rc-badge ok">${icon(UI.check, { size: 22, stroke: 2.4 })}</span>
+      <div><div class="rc-title">Skorun sıralamaya girdi</div>
+        <div class="rc-sub"><b>${esc(r.nick)}</b>${r.day ? ` · ${nf(r.day.players)} oyuncu arasında` : ''}</div></div>
     </div>
-    ${r.day ? `<span>${nf(r.day.players)} oyuncu arasında</span>` : ''}
+    <div class="rc-tiles">
+      ${rankTile(UI.calendar, '#6c4cff', r.day ? `#${nf(r.day.rank)}` : '–', 'Bugün')}
+      ${rankTile(UI.trophy, '#ff9f1c', r.week ? `#${nf(r.week.rank)}` : '–', 'Haftalık genel')}
+      ${rankTile(UI.star, '#16b3a3', r.week ? nf(r.week.score) : '–', 'Hafta puanın')}
+    </div>
   </div>`;
 }
+
+const pendingCard = () => `<div class="rcard">
+    <div class="rc-head"><span class="rc-badge spin">${icon(UI.loader, { size: 22, stroke: 2.4 })}</span>
+      <div><div class="rc-title">Skorun gönderiliyor…</div><div class="rc-sub">Sıran birazdan burada</div></div></div>
+  </div>`;
+
+const failCard = final => `<div class="rcard">
+    <div class="rc-head"><span class="rc-badge bad">${icon(UI.alert, { size: 22, stroke: 2.4 })}</span>
+      <div><div class="rc-title">${final ? 'Skor kabul edilmedi' : 'Skor gönderilemedi'}</div>
+        <div class="rc-sub">${final ? 'Gün değişmiş olabilir.' : 'Bağlantını kontrol edip tekrar dene.'}</div></div></div>
+    ${final ? '' : `<button class="btn alt" id="retry">${icon(UI.replay)} Tekrar dene</button>`}
+  </div>`;
 
 export function render(app, ctx) {
   const { state, go, bag } = ctx;
@@ -33,8 +52,8 @@ export function render(app, ctx) {
         <div class="bar"><i style="width:0" data-w="${t.scores[id]}"></i></div><div class="sc">${t.scores[id]}</div>
       </div>`).join('')}</div>
     <div id="sub"></div>
-    <div class="btnrow"><button class="btn" id="cp">Paylaş</button><button class="btn alt" id="lb2">🏆 Sıralama</button></div>
-    <button class="btn alt" id="again">Tekrar oyna <small style="font-size:13px;opacity:.7">· sıralamaya sayılmaz</small></button>
+    <div class="btnrow"><button class="btn" id="cp">${icon(UI.share)} Paylaş</button><button class="btn alt" id="lb2">${icon(UI.trophy)} Sıralama</button></div>
+    <button class="btn alt" id="again">${icon(UI.replay)} Tekrar oyna <small class="btn-note">· sıralamaya sayılmaz</small></button>
     ${countdownFooter()}`;
 
   bindTopBar(ctx, 'results');
@@ -58,22 +77,21 @@ export function render(app, ctx) {
   $('cp').onclick = async function () {
     try {
       if (navigator.share && /Mobi|Android|iPhone/i.test(navigator.userAgent)) await navigator.share({ text });
-      else { await navigator.clipboard.writeText(text); this.textContent = 'Kopyalandı ✓'; }
+      else { await navigator.clipboard.writeText(text); this.innerHTML = `${icon(UI.check)} Kopyalandı`; }
     } catch (e) {
-      if (e?.name !== 'AbortError') this.textContent = 'Metni seçip kopyala';
+      if (e?.name !== 'AbortError') this.textContent = 'Kopyalanamadı';
     }
   };
 
   const sub = $('sub');
   const send = () => {
-    sub.innerHTML = '<div class="subok"><span>Skor gönderiliyor…</span></div>';
+    sub.innerHTML = pendingCard();
     submitDay(state).then(
       ranks => { if (sub.isConnected) sub.innerHTML = ranksCard(ranks); },
       e => {
         if (!sub.isConnected) return;
         const final = e.status === 400;
-        sub.innerHTML = `<div class="subfail">${final ? 'Skor kabul edilmedi: gün değişmiş olabilir.' : 'Skor gönderilemedi.'}
-          ${final ? '' : '<button class="btn alt" id="retry">Tekrar dene</button>'}</div>`;
+        sub.innerHTML = failCard(final);
         if (!final) $('retry').onclick = send;
       },
     );
