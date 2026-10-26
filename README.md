@@ -12,7 +12,6 @@ Her gün herkesin aynı 5 algı oyununu oynadığı, üyeliksiz, Türkçe günl�
 ```bash
 npm install
 npm run dev      # http://localhost:5173
-npm test         # birim testleri
 npm run build    # dist/ üretir
 ```
 

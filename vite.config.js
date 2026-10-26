@@ -47,7 +47,4 @@ function localApi() {
 
 export default defineConfig({
   plugins: [localApi()],
-  test: {
-    include: ['tests/**/*.test.js'],
-  },
 });
