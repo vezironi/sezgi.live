@@ -1,0 +1,1 @@
+// sezgi.live giriş noktası
