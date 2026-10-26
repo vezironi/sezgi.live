@@ -33,6 +33,7 @@ export function render(app, ctx) {
         <div class="bar"><i style="width:0" data-w="${t.scores[id]}"></i></div><div class="sc">${t.scores[id]}</div>
       </div>`).join('')}</div>
     <div id="sub"></div>
+    <pre class="share">${esc(text)}</pre>
     <div class="btnrow"><button class="btn" id="cp">Paylaş</button><button class="btn alt" id="lb2">🏆 Sıralama</button></div>
     ${countdownFooter()}`;
 
