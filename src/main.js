@@ -12,10 +12,20 @@ import * as board from './ui/screens/board.js';
 import * as practice from './ui/screens/practice.js';
 import { submitDay, ensureIdentity } from './submit.js';
 import { createPractice } from './practice.js';
+import { GAMES } from '../shared/games.js';
+import { syncThemeColor } from './ui/theme.js';
 
 const app = document.getElementById('app');
 const state = createState();
 const screens = { home, intro, play, results, board, practice };
+
+// Her ekranın sekme başlığı; ana sayfa index.html'deki SEO başlığını korur.
+const HOME_TITLE = document.title;
+const titleFor = (name, params) => {
+  const page = { results: 'Sonucun', board: 'Skor Tablosu', practice: 'Antrenman' }[name]
+    ?? (params.id && GAMES[params.id] ? GAMES[params.id].ad + (params.practice ? ' · Antrenman' : '') : null);
+  return page ? `${page} | sezgi.live` : HOME_TITLE;
+};
 
 let cleanups = [];
 const bag = { add: fn => cleanups.push(fn) };
@@ -25,6 +35,7 @@ function go(name, params = {}) {
   cleanups = [];
   app.removeAttribute('style');
   app.dataset.screen = name;
+  document.title = titleFor(name, params);
   window.scrollTo(0, 0);
   screens[name].render(app, ctx, params);
 }
@@ -44,6 +55,8 @@ const ctx = {
 // Kimliği arka planda al; tamamlanmış ama gönderilememiş gün varsa yeniden dene.
 if (state.isComplete() && !state.today().submitted) submitDay(state).catch(() => {});
 else ensureIdentity(state).catch(() => {});
+
+syncThemeColor();
 
 if (import.meta.env.DEV) window.__go = go;
 

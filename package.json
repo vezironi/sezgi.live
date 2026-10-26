@@ -2,7 +2,21 @@
   "name": "sezgi-live",
   "private": true,
   "version": "1.0.0",
+  "description": "sezgi.live: her gün yeni 5 algı oyunu sunan ücretsiz, üyeliksiz, Türkçe günlük oyun sitesi.",
+  "keywords": [
+    "algı oyunu",
+    "günlük oyun",
+    "beyin oyunu",
+    "türkçe",
+    "daily puzzle",
+    "perception game"
+  ],
+  "homepage": "https://sezgi.live",
   "type": "module",
+  "packageManager": "pnpm@12.14.0",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -16,9 +30,5 @@
   },
   "devDependencies": {
     "vite": "^5.4.21"
-  },
-  "engines": {
-    "node": ">=20"
-  },
-  "packageManager": "pnpm@12.14.0"
+  }
 }
