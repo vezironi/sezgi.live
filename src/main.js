@@ -4,10 +4,12 @@ import './styles/games.css';
 import { createState } from './state.js';
 import { register } from './api.js';
 import * as home from './ui/screens/home.js';
+import * as intro from './ui/screens/intro.js';
+import * as play from './ui/screens/play.js';
 
 const app = document.getElementById('app');
 const state = createState();
-const screens = { home };
+const screens = { home, intro, play };
 
 let cleanups = [];
 const bag = { add: fn => cleanups.push(fn) };
