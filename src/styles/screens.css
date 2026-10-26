@@ -156,3 +156,17 @@
 .rc-tile small { font-size:11.5px; font-weight:800; color:var(--muted); }
 .rcard .btn { margin-top:14px; }
 .lbrow .rk, .lbme .rk { display:flex; align-items:center; }
+
+/* İkon + Baloo 2 metni aynı hizada: fontun üst boşluğu yazıyı aşağı itiyor, satır kutusunu harf boyuna kırp. */
+@supports (text-box: trim-both cap alphabetic) {
+  .btn { text-box: trim-both cap alphabetic; padding-top:20px; padding-bottom:20px; }
+}
+
+/* Koyu tema: kart ve panellerdeki siyah gölgeler koyu zeminde çamurlaşıyor; yerine çok ince bir üst ışık. Düğmeler olduğu gibi. */
+:root[data-theme="dark"] { --shadow:none; }
+:root[data-theme="dark"] .rank,
+:root[data-theme="dark"] .daycard,
+:root[data-theme="dark"] .rcard,
+:root[data-theme="dark"] .fb,
+:root[data-theme="dark"] .steps,
+:root[data-theme="dark"] .stage { box-shadow:inset 0 1px 0 rgba(255,255,255,.04); }
