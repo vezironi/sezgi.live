@@ -6,23 +6,25 @@ import { ICONS } from '../icons.js';
 import { $, gvars } from '../dom.js';
 import { gameBar, bindGameBar } from '../gamebar.js';
 
-export function render(app, ctx, { id }) {
+export function render(app, ctx, { id, practice = false }) {
   const { state, go, bag } = ctx;
   const g = GAMES[id], R = RENDERERS[id], L = layout();
-  const puzzle = PUZZLES[id].generate(state.today().date);
+  // Antrenmanda her seferinde yeni sorular; günlük oyunda herkes için aynı soru.
+  const session = practice ? ctx.practice : null;
+  const puzzle = PUZZLES[id].generate(practice ? session.seed(id) : state.today().date);
   let answered = false;
 
   app.setAttribute('style', gvars(g));
-  app.innerHTML = `${gameBar(state, id)}
-    <div class="gtitle"><div class="gicon">${ICONS[id]}</div><h2>${g.ad}</h2></div>
+  app.innerHTML = `${gameBar(practice ? session : state.today(), id)}
+    <div class="gtitle"><div class="gicon">${ICONS[id]}</div><h2>${g.ad}</h2>${practice ? '<span class="ptag">Antrenman</span>' : ''}</div>
     <div class="prompt">${R.prompt(puzzle, L)}</div>
     <div class="stage" id="st" style="aspect-ratio:${L.wide ? '16 / 10' : '1 / 1'}"></div>
     <div id="below"></div>
     <div id="fb"></div>`;
 
-  // Oyunun ortasında çıkmak, sayfayı kapatmakla aynı sayılır: oyun 0 puan.
   bindGameBar(state, () => {
-    if (!answered) {
+    // Günlük oyunun ortasında çıkmak, sayfayı kapatmakla aynı sayılır: oyun 0 puan. Antrenmanda kural yok.
+    if (!practice && !answered) {
       if (!confirm('Çıkarsan bu oyun 0 puan sayılır. Emin misin?')) return;
       state.finishGame(id, 0);
     }
@@ -40,11 +42,15 @@ export function render(app, ctx, { id }) {
       if (answered) return;
       answered = true;
       const score = PUZZLES[id].score(puzzle, answer);
-      state.finishGame(id, score);
-      const next = state.nextGame();
+      let next;
+      if (practice) { session.finish(id, score); next = session.nextGame(); }
+      else { state.finishGame(id, score); next = state.nextGame(); }
       $('fb').innerHTML = `<div class="fb"><div class="pts">${score}<small>puan</small></div><div class="tx">${html}</div></div>
         <button class="btn" id="next">${next ? 'Devam →' : 'Sonucu gör'}</button>`;
-      $('next').onclick = () => (next ? go('intro', { id: next }) : go('results'));
+      $('next').onclick = () => {
+        if (next) go('intro', { id: next, practice });
+        else go(practice ? 'practice' : 'results');
+      };
       $('next').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     },
   });

@@ -39,7 +39,9 @@ export function render(app, ctx) {
     ? (() => {
         const day = dayScore(t.set.map(id => t.scores[id]));
         return `<div class="daycard"><div class="lbl">Bugünün puanın</div><div class="n">${day}</div><div class="lbl">/ 100</div><div class="rank">${rankFor(day)}</div></div>
-          <button class="btn" id="go">Sonucu gör</button>`;
+          <button class="btn" id="go">Sonucu gör</button>
+          <button class="btn alt" id="again">Tekrar oyna</button>
+          <div class="ft">Tekrar oynadıkların sıralamaya sayılmaz</div>`;
       })()
     : `<div class="games">${cards}</div>
        <button class="btn" id="go">${started ? 'Devam et' : 'Başla'}</button>`;
@@ -51,5 +53,6 @@ export function render(app, ctx) {
 
   bindTopBar(ctx, 'home');
   $('go').onclick = () => (complete ? go('results') : go('intro', { id: state.nextGame() }));
+  if (complete) $('again').onclick = ctx.startPractice;
   startCountdown(ctx);
 }

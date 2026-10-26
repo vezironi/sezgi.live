@@ -23,17 +23,20 @@ const INTRO = {
             steps: ['Çizginin bir ucu <b>başlangıç</b> olarak işaretli', 'Başlangıçtan istenen kesir kadar uzaktaki noktayı bul', 'İşaretçiyi sürükle, <b>bıraktığın an</b> cevabın kaydedilir'] },
 };
 
-export function render(app, ctx, { id }) {
+export function render(app, ctx, params) {
+  const { id } = params;
   const { state, go } = ctx;
-  const g = GAMES[id], t = state.today(), text = INTRO[id];
+  const practice = !!params.practice;
+  const g = GAMES[id], t = practice ? ctx.practice : state.today(), text = INTRO[id];
   const steps = id === 'renk' && layout().wide ? text.steps.map(s => s.replace('parmağını gezdir', 'fareyi sürükle')) : text.steps;
   const pos = t.set.indexOf(id);
+  const label = pos >= 0 ? `Oyun ${pos + 1} / ${t.set.length}` : 'Deneme';
 
   app.setAttribute('style', gvars(g));
-  app.innerHTML = `${gameBar(state, id)}
+  app.innerHTML = `${gameBar(t, id)}
     <div class="intro">
       <div class="gicon big">${ICONS[id]}</div>
-      <div class="no">${pos >= 0 ? `Oyun ${pos + 1} / ${t.set.length}` : 'Deneme'}</div>
+      <div class="no">${practice ? `Antrenman · ${label}` : label}</div>
       <h2>${g.ad}</h2>
       <p class="lead">${text.lead}</p>
     </div>
@@ -41,5 +44,8 @@ export function render(app, ctx, { id }) {
     <button class="btn go" id="ready">Hazırım!</button>`;
 
   bindGameBar(state, () => go('home'));
-  $('ready').onclick = () => { state.startGame(id); go('play', { id }); };
+  $('ready').onclick = () => {
+    if (!practice) state.startGame(id);
+    go('play', { id, practice });
+  };
 }

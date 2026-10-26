@@ -3,8 +3,9 @@ import { GAMES } from '../../shared/games.js';
 import { $ } from './dom.js';
 import { themeButton, bindThemeButton } from './theme.js';
 
-export function gameBar(state, currentId) {
-  const t = state.today();
+// progress: { set, scores } — günlük oyunda state.today(), antrenmanda antrenman oturumu.
+export function gameBar(progress, currentId) {
+  const t = progress;
   const segs = t.set.map(id => {
     if (id in t.scores) return `<i class="d" style="--gc2:${GAMES[id].gc}"></i>`;
     if (id === currentId) return `<i style="background:${GAMES[id].gc};opacity:.45"></i>`;

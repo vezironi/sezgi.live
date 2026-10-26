@@ -34,11 +34,13 @@ export function render(app, ctx) {
       </div>`).join('')}</div>
     <div id="sub"></div>
     <div class="btnrow"><button class="btn" id="cp">Paylaş</button><button class="btn alt" id="lb2">🏆 Sıralama</button></div>
+    <button class="btn alt" id="again">Tekrar oyna <small style="font-size:13px;opacity:.7">· sıralamaya sayılmaz</small></button>
     ${countdownFooter()}`;
 
   bindTopBar(ctx, 'results');
   startCountdown(ctx);
   $('lb2').onclick = () => go('board', { back: 'results' });
+  $('again').onclick = ctx.startPractice;
 
   // Puan sayarak yükselir, çubuklar dolar.
   const tn = $('tn'), t0 = performance.now();

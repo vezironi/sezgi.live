@@ -9,11 +9,13 @@ import * as intro from './ui/screens/intro.js';
 import * as play from './ui/screens/play.js';
 import * as results from './ui/screens/results.js';
 import * as board from './ui/screens/board.js';
+import * as practice from './ui/screens/practice.js';
 import { submitDay, ensureIdentity } from './submit.js';
+import { createPractice } from './practice.js';
 
 const app = document.getElementById('app');
 const state = createState();
-const screens = { home, intro, play, results, board };
+const screens = { home, intro, play, results, board, practice };
 
 let cleanups = [];
 const bag = { add: fn => cleanups.push(fn) };
@@ -27,7 +29,17 @@ function go(name, params = {}) {
   screens[name].render(app, ctx, params);
 }
 
-const ctx = { state, go, bag };
+const ctx = {
+  state,
+  go,
+  bag,
+  practice: null,
+  // Günün oyunlarını yeni sorularla, sıralamaya saymadan yeniden oynat.
+  startPractice() {
+    ctx.practice = createPractice(state.today().set);
+    go('intro', { id: ctx.practice.nextGame(), practice: true });
+  },
+};
 
 // Kimliği arka planda al; tamamlanmış ama gönderilememiş gün varsa yeniden dene.
 if (state.isComplete() && !state.today().submitted) submitDay(state).catch(() => {});
