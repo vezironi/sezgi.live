@@ -35,9 +35,17 @@ test('submitDay kimlik alıp gönderir ve işaretler', async () => {
 test('açılış kaydı ile gönderim aynı anda olursa tek kimlik', async () => {
   completeDay(state);
   api.register.mockResolvedValue({ token: 't1', nick: 'sl-1111' });
-  api.submitScore.mockResolvedValue({});
+  api.submitScore.mockResolvedValue({ nick: 'sl-1111', day: { score: 60, rank: 1, players: 1 } });
   await Promise.all([ensureIdentity(state), submitDay(state)]);
   expect(api.register).toHaveBeenCalledTimes(1);
+});
+
+test('sunucu "zaten gönderildi" deyip sıra döndürmezse gün işaretlenmez', async () => {
+  completeDay(state);
+  state.setIdentity({ token: 't', nick: 'sl-1' });
+  api.submitScore.mockResolvedValue({ already: true, nick: 'sl-1', day: null, week: null, games: {} });
+  await expect(submitDay(state)).rejects.toBeTruthy();
+  expect(state.today().submitted).toBe(false);
 });
 
 test('401 kimliği siler, hata yükselir, işaretlenmez', async () => {

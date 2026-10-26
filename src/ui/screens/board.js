@@ -6,6 +6,16 @@ import { $, esc, gvars, nf } from '../dom.js';
 import { themeButton, bindThemeButton } from '../theme.js';
 
 const MEDALS = ['🥇', '🥈', '🥉'];
+const ME_TTL_MS = 60000;
+
+// "/api/me" yanıtı tüm sekmeleri kapsar: sekme değiştirirken yeniden istenmez.
+let meCache = null;
+function loadMe(token, date) {
+  if (meCache && meCache.token === token && meCache.date === date && Date.now() - meCache.at < ME_TTL_MS) return meCache.req;
+  const req = getMe(token, date).catch(() => { meCache = null; return null; });
+  meCache = { token, date, at: Date.now(), req };
+  return req;
+}
 
 function subtitle(tab, date, players) {
   if (tab === 'day') return `#${puzzleNumber(date)} · ${nf(players)} oyuncu · günün puanı (en fazla 100)`;
@@ -47,7 +57,7 @@ export function render(app, ctx, { back = 'home', tab = 'day' } = {}) {
     try {
       const [board, me] = await Promise.all([
         getBoard(isGame ? 'game' : tab, { game: isGame ? tab : undefined, date: t.date }),
-        id ? getMe(id.token, t.date).catch(() => null) : null,
+        id ? loadMe(id.token, t.date) : null,
       ]);
       if (!list.isConnected) return;
       $('sub').textContent = subtitle(tab, t.date, board.players);

@@ -20,6 +20,7 @@ export function createFakeRedis() {
       strings.set(key, value);
       return 'OK';
     },
+    async del(key) { const had = strings.delete(key) || zsets.delete(key); return had ? 1 : 0; },
     async incr(key) { const v = Number(strings.get(key) ?? 0) + 1; strings.set(key, v); return v; },
     async expire() { return 1; },
     async zadd(key, ...args) {
@@ -55,12 +56,14 @@ export function createFakeRedis() {
       const queue = [];
       const p = {};
       for (const name of Object.keys(api)) {
-        if (name === 'pipeline') continue;
+        if (name === 'pipeline' || name === 'multi') continue;
         p[name] = (...args) => { queue.push([name, args]); return p; };
       }
       p.exec = async () => { const out = []; for (const [name, args] of queue) out.push(await api[name](...args)); return out; };
       return p;
     },
+    // Bellek içinde işlem zaten tek seferde uygulanır; MULTI ile PIPELINE aynı davranır.
+    multi() { return api.pipeline(); },
   };
   return api;
 }

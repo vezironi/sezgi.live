@@ -20,6 +20,7 @@ export function submitDay(state) {
     const id = await ensureIdentity(state);
     try {
       const ranks = await submitScore({ token: id.token, date: day.date, scores: day.scores });
+      if (!ranks.day) throw Object.assign(new Error('Sıra alınamadı'), { status: 503 });
       // Gece yarısı geçtiyse yeni günün kaydını işaretleme.
       if (state.today().date === day.date) state.markSubmitted(ranks);
       return ranks;

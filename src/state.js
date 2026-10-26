@@ -6,7 +6,12 @@ const KEY = 'sezgi-v1';
 const THEME_KEY = 'sezgi-tema';
 
 // localStorage erişilemezse (gizli mod, kota, engelleme) bellek içi Map'e düşer.
-export function safeLocalStorage(backing = globalThis.localStorage) {
+export function safeLocalStorage(storage) {
+  let backing = storage;
+  if (arguments.length === 0) {
+    // Site verisi engelliyken window.localStorage'a erişmek bile SecurityError fırlatır.
+    try { backing = globalThis.localStorage; } catch { backing = null; }
+  }
   const mem = new Map();
   const attempt = (fn, fallback) => { try { return backing ? fn() : fallback(); } catch { return fallback(); } };
   return {

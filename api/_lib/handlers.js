@@ -5,7 +5,9 @@ import { dailySet } from '../../shared/rotation.js';
 import { GAME_IDS } from '../../shared/games.js';
 import { validateSubmission } from '../../shared/validate.js';
 
-const REGISTER_LIMIT = 20;
+// Türk mobil operatörleri çok sayıda aboneyi aynı IP'nin arkasına koyar: kısa patlama sınırı + geniş günlük sınır.
+const REGISTER_PER_MINUTE = 10;
+const REGISTER_PER_DAY = 300;
 
 export function json(data, status = 200, headers = {}) {
   return new Response(JSON.stringify(data), {
@@ -34,10 +36,13 @@ async function claimNick(redis, token) {
 export function makeRegister({ redis, now }) {
   return async req => {
     if (req.method !== 'POST') return json({ error: 'Yalnızca POST' }, 405);
-    const rl = keys.rl(clientIp(req), istanbulDate(now()));
-    const count = await redis.incr(rl);
-    if (count === 1) await redis.expire(rl, TTL.rl);
-    if (count > REGISTER_LIMIT) return json({ error: 'Çok fazla deneme' }, 429);
+    const ip = clientIp(req), t = now();
+    const minuteKey = keys.rlMinute(ip, Math.floor(t.getTime() / 60000));
+    const dayKey = keys.rl(ip, istanbulDate(t));
+    const [perMinute, perDay] = await Promise.all([redis.incr(minuteKey), redis.incr(dayKey)]);
+    if (perMinute === 1) await redis.expire(minuteKey, 60);
+    if (perDay === 1) await redis.expire(dayKey, TTL.rl);
+    if (perMinute > REGISTER_PER_MINUTE || perDay > REGISTER_PER_DAY) return json({ error: 'Çok fazla deneme' }, 429);
 
     const token = newToken();
     const nick = await claimNick(redis, token);
@@ -54,25 +59,39 @@ const DATE_RE = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
 
 const pointsOf = composite => Math.floor(composite / SCALE);
 
-async function standing(redis, key, member) {
-  const c = await redis.zscore(key, member);
-  if (c === null || c === undefined) return null;
-  const score = pointsOf(Number(c));
-  const above = await redis.zcount(key, (score + 1) * SCALE, '+inf');
-  return { score, rank: above + 1 };
-}
-
+// İki tur: önce tüm puanlar ve oyuncu sayıları, sonra yalnızca gereken sıra sayımları.
 async function ranksFor(redis, nick, date) {
   const dayKey = keys.day(date), weekKey = keys.week(weekStart(date));
-  const [day, week] = await Promise.all([standing(redis, dayKey, nick), standing(redis, weekKey, nick)]);
-  if (day) day.players = await redis.zcard(dayKey);
-  if (week) week.players = await redis.zcard(weekKey);
-  const games = {};
-  for (const id of dailySet(date)) {
-    const g = await standing(redis, keys.game(date, id), nick);
-    if (g) games[id] = g;
+  const set = dailySet(date);
+  const boards = [dayKey, weekKey, ...set.map(id => keys.game(date, id))];
+
+  const p1 = redis.pipeline();
+  boards.forEach(k => p1.zscore(k, nick));
+  p1.zcard(dayKey);
+  p1.zcard(weekKey);
+  const r1 = await p1.exec();
+  const scores = r1.slice(0, boards.length).map(c => (c === null || c === undefined ? null : pointsOf(Number(c))));
+  const [dayPlayers, weekPlayers] = r1.slice(boards.length);
+
+  const present = boards.map((k, i) => [k, scores[i]]).filter(([, sc]) => sc !== null);
+  const ranks = {};
+  if (present.length) {
+    const p2 = redis.pipeline();
+    present.forEach(([k, sc]) => p2.zcount(k, (sc + 1) * SCALE, '+inf'));
+    (await p2.exec()).forEach((above, i) => { ranks[present[i][0]] = Number(above) + 1; });
   }
-  return { nick, day, week, games };
+
+  const at = (i, extra = {}) => (scores[i] === null ? null : { score: scores[i], rank: ranks[boards[i]], ...extra });
+  const games = {};
+  set.forEach((id, i) => { const g = at(i + 2); if (g) games[id] = g; });
+  return { nick, day: at(0, { players: dayPlayers }), week: at(1, { players: weekPlayers }), games };
+}
+
+// Tablolar en fazla 8 gün tutulur; gelecek için 1 günlük saat farkı payı.
+function dateAllowed(date, now) {
+  if (!DATE_RE.test(date)) return false;
+  const offset = daysBetween(istanbulDate(now), date);
+  return offset >= -8 && offset <= 1;
 }
 
 async function nickFor(redis, token) {
@@ -100,7 +119,8 @@ export function makeScore({ redis, now }) {
     const weekSecs = daysBetween(monday, v.date) * 86400 + secs;
     const dayKey = keys.day(v.date), weekKey = keys.week(monday);
 
-    const p = redis.pipeline();
+    // MULTI: ya hepsi yazılır ya hiçbiri. Hata olursa gönderim hakkı geri verilir, istemci tekrar dener.
+    const p = redis.multi();
     p.zadd(dayKey, { score: v.day * SCALE + (TIE_MAX - secs), member: nick });
     p.expire(dayKey, TTL.day);
     for (const id of Object.keys(v.scores)) {
@@ -111,7 +131,12 @@ export function makeScore({ redis, now }) {
     p.zadd(weekKey, { nx: true }, { score: TIE_MAX - weekSecs, member: nick });
     p.zincrby(weekKey, v.day * SCALE, nick);
     p.expire(weekKey, TTL.week);
-    await p.exec();
+    try {
+      await p.exec();
+    } catch {
+      await redis.del(keys.sub(v.date, body.token)).catch(() => {});
+      return json({ error: 'Skor kaydedilemedi, tekrar dene' }, 503);
+    }
 
     return json({ already: false, ...(await ranksFor(redis, nick, v.date)) });
   };
@@ -122,7 +147,7 @@ export function makeBoard({ redis, now }) {
     const q = new URL(req.url).searchParams;
     const type = q.get('type');
     const date = q.get('date') ?? istanbulDate(now());
-    if (!DATE_RE.test(date)) return json({ error: 'Geçersiz tarih' }, 400);
+    if (!dateAllowed(date, now())) return json({ error: 'Geçersiz tarih' }, 400);
     let key, limit = 100;
     if (type === 'day') key = keys.day(date);
     else if (type === 'week') key = keys.week(weekStart(date));
@@ -144,7 +169,7 @@ export function makeMe({ redis, now }) {
   return async req => {
     const q = new URL(req.url).searchParams;
     const date = q.get('date') ?? istanbulDate(now());
-    if (!DATE_RE.test(date)) return json({ error: 'Geçersiz tarih' }, 400, { 'cache-control': 'private, no-store' });
+    if (!dateAllowed(date, now())) return json({ error: 'Geçersiz tarih' }, 400, { 'cache-control': 'private, no-store' });
     const nick = await nickFor(redis, req.headers.get('x-sezgi-token'));
     if (!nick) return json({ error: 'Bilinmeyen kimlik' }, 401, { 'cache-control': 'private, no-store' });
     return json(await ranksFor(redis, nick, date), 200, { 'cache-control': 'private, no-store' });

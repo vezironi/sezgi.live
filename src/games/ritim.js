@@ -41,20 +41,33 @@ export function mount({ stage, puzzle, onAnswer, bag }) {
     onAnswer({ offsets }, `Tempo <b>${puzzle.bpm} BPM</b>. Ortalama sapman <b>${Math.round(mean)} ms</b>. ${tempo}`);
   };
 
+  // iOS Safari sesi yalnızca click/keydown gibi bir hareketle açar; bağlam askıdaysa resume edilir.
+  const start = async () => {
+    if (phase !== 'ready') return;
+    phase = 'starting';
+    actx = new (window.AudioContext || window.webkitAudioContext)();
+    try { await actx.resume(); } catch { /* ses açılamazsa görsel nabız yine çalışır */ }
+    const unlock = actx.createBufferSource();
+    unlock.buffer = actx.createBuffer(1, 1, 22050);
+    unlock.connect(actx.destination);
+    unlock.start();
+    begin();
+  };
+
+  // Referans vuruşlar ses saatinde planlanır; ızgara aynı ana performance.now() ile bağlanır.
+  const begin = () => {
+    const a0 = actx.currentTime + LEAD_MS / 1000;
+    for (let k = 0; k < REF_BEATS; k++) blip(a0 + (k * I) / 1000, k === 0);
+    // Ses çıkış gecikmesi kadar ızgarayı kaydır (özellikle mobil/Bluetooth).
+    tStart = performance.now() + LEAD_MS + (actx.outputLatency || actx.baseLatency || 0) * 1000;
+    phase = 'run';
+    b.textContent = 'Dokun';
+    hint.textContent = 'Dinle ve eşlik et…';
+    for (let k = 0; k < REF_BEATS; k++) later(bag, () => pulse('beat'), LEAD_MS + k * I);
+    later(bag, () => { hint.textContent = 'Ses kesildi, devam et!'; }, LEAD_MS + (REF_BEATS - 0.5) * I);
+  };
+
   const tap = () => {
-    if (phase === 'ready') {
-      actx = new (window.AudioContext || window.webkitAudioContext)();
-      const a0 = actx.currentTime + LEAD_MS / 1000;
-      for (let k = 0; k < REF_BEATS; k++) blip(a0 + (k * I) / 1000, k === 0);
-      // Ses çıkış gecikmesi kadar ızgarayı kaydır (özellikle mobil/Bluetooth).
-      tStart = performance.now() + LEAD_MS + (actx.outputLatency || actx.baseLatency || 0) * 1000;
-      phase = 'run';
-      b.textContent = 'Dokun';
-      hint.textContent = 'Dinle ve eşlik et…';
-      for (let k = 0; k < REF_BEATS; k++) later(bag, () => pulse('beat'), LEAD_MS + k * I);
-      later(bag, () => { hint.textContent = 'Ses kesildi, devam et!'; }, LEAD_MS + (REF_BEATS - 0.5) * I);
-      return;
-    }
     if (phase !== 'run') return;
     taps.push(performance.now());
     pulse('hit');
@@ -63,11 +76,14 @@ export function mount({ stage, puzzle, onAnswer, bag }) {
     if (n >= FREE_BEATS) finish();
   };
 
-  b.onpointerdown = e => { e.preventDefault(); tap(); };
+  // Başlatma click ile (iOS ses kilidi), vuruşlar pointerdown ile (en düşük gecikme).
+  b.onclick = start;
+  b.onpointerdown = e => { if (phase === 'run') { e.preventDefault(); tap(); } };
   const onKey = e => {
     if (e.code !== 'Space') return;
     e.preventDefault();
-    if (!e.repeat) tap();
+    if (e.repeat) return;
+    if (phase === 'ready') start(); else tap();
   };
   document.addEventListener('keydown', onKey);
   bag.add(() => { document.removeEventListener('keydown', onKey); if (actx) actx.close(); });

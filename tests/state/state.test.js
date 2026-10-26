@@ -120,6 +120,19 @@ test('storage throw ederse çalışmaya devam eder', () => {
   expect(s.theme()).toBe('light');
 });
 
+test('localStorage erişimi (getter) throw ederse uygulama açılır', () => {
+  const desc = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
+  Object.defineProperty(globalThis, 'localStorage', { configurable: true, get() { throw new Error('SecurityError'); } });
+  try {
+    const s = createState({ now });
+    const id = s.today().set[0];
+    s.startGame(id); s.finishGame(id, 55);
+    expect(s.today().scores[id]).toBe(55);
+  } finally {
+    if (desc) Object.defineProperty(globalThis, 'localStorage', desc); else delete globalThis.localStorage;
+  }
+});
+
 test('localStorage yoksa bellek kullanılır', () => {
   const s = safeLocalStorage(undefined);
   s.setItem('a', '1');

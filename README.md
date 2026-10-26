@@ -25,10 +25,11 @@ oyunu tek başına açmak için tarayıcı konsolunda: `__go('intro', { id: 'rit
 1. Projeyi GitHub'a gönder.
 2. Vercel → **Add New → Project** → depoyu içe aktar. Framework otomatik "Vite" algılanır
    (`vercel.json` hazır).
-3. Proje → **Storage → Marketplace → Upstash (Redis)** → oluştur ve projeye bağla.
+3. Proje → **Storage → Marketplace → Upstash (Redis)** → bölge olarak **Frankfurt (eu-central-1)** seç, oluştur ve projeye bağla.
+   (Fonksiyonlar `vercel.json` ile `fra1` bölgesine sabitlendi; ikisi aynı bölgede olunca istekler hızlı olur.)
    `KV_REST_API_URL` ve `KV_REST_API_TOKEN` ortam değişkenleri otomatik eklenir
    (`UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` adları da desteklenir).
-4. **Deploy**.
+4. **Deploy**. Redis bağlı değilse API bilerek hata verir (skorlar sessizce kaybolmasın diye).
 5. **Settings → Domains** → `sezgi.live` alan adını bağla.
 
 ## Önemli notlar

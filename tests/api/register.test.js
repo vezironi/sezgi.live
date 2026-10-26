@@ -34,7 +34,7 @@ test('4 hane doluysa 5 haneye geçer', async () => {
 test('IP hız sınırı', async () => {
   const h = makeRegister({ redis: createFakeRedis(), now: () => now });
   const req = () => post({ 'x-forwarded-for': '1.2.3.4, 10.0.0.1' });
-  for (let i = 0; i < 20; i++) expect((await h(req())).status).toBe(200);
+  for (let i = 0; i < 10; i++) expect((await h(req())).status).toBe(200);
   const r = await h(req());
   expect(r.status).toBe(429);
   expect((await r.json()).error).toBe('Çok fazla deneme');

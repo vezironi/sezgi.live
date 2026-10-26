@@ -11,4 +11,5 @@ export const keys = {
   week: monday => `lb:week:${monday}`,
   game: (date, id) => `lb:game:${date}:${id}`,
   rl: (ip, date) => `rl:reg:${ip}:${date}`,
+  rlMinute: (ip, minute) => `rl:regm:${ip}:${minute}`,
 };
