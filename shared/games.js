@@ -12,3 +12,8 @@ export const GAMES = {
   ritim:   { id: 'ritim',   ad: 'Ritim',   ds: 'Tempoyu bozmadan devam et', gc: '#e84393', gce: '#bf2873' },
   oran:    { id: 'oran',    ad: 'Oran',    ds: 'Çizgide kesri bul',         gc: '#56637d', gce: '#3b465c' },
 };
+
+// Günün puanı: oyun puanlarının yuvarlanmış ortalaması (0-100). İstemci ve sunucu aynı formülü kullanır.
+export function dayScore(scores) {
+  return Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+}
