@@ -1,0 +1,128 @@
+/* Ekranlar: ana sayfa, oyun başlığı, geri bildirim, sonuç, tanıtım, skor tablosu, masaüstü */
+/* Home */
+.hero { margin:22px 0 16px; }
+.hero .no { font-size:13px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
+.hero h1 { margin:4px 0 0; font-size:30px; font-weight:600; line-height:1.15; }
+.gcard { display:flex; align-items:center; gap:14px; padding:14px; margin-bottom:12px; border-radius:20px; position:relative;
+         background:var(--gc); color:#fff; box-shadow:0 5px 0 var(--gce); transition:transform .12s; }
+:root[data-theme="dark"] .gcard { background:color-mix(in srgb, var(--gc) 26%, var(--surface)); color:var(--fg); box-shadow:0 5px 0 color-mix(in srgb, var(--gc) 14%, #000); border:1.5px solid color-mix(in srgb, var(--gc) 45%, transparent); }
+.gicon { width:48px; height:48px; border-radius:15px; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,.22); }
+:root[data-theme="dark"] .gicon { background:var(--gc); }
+.gicon svg { width:28px; height:28px; }
+.gname { font-family:"Baloo 2"; font-weight:600; font-size:19px; }
+.gdesc { font-size:13px; opacity:.88; font-weight:700; }
+.gnum { margin-left:auto; font-family:"Baloo 2"; font-weight:700; font-size:14px; width:28px; height:28px; border-radius:50%; background:rgba(0,0,0,.15); display:flex; align-items:center; justify-content:center; }
+
+.gbar { display:flex; align-items:center; gap:10px; margin-bottom:18px; }
+.prog { flex:1; display:flex; gap:6px; }
+.prog i { flex:1; height:8px; border-radius:4px; background:var(--line); }
+.prog i.d { background:var(--gc2,var(--muted)); }
+.gtitle { display:flex; align-items:center; gap:12px; margin-bottom:6px; }
+.gtitle .gicon { background:var(--gc); width:44px; height:44px; box-shadow:0 4px 0 var(--gce); }
+.gtitle h2 { margin:0; font-size:26px; font-weight:600; }
+.prompt { font-size:16px; line-height:1.45; margin:6px 0 16px; font-weight:700; color:var(--muted); }
+.prompt strong { color:var(--fg); font-family:"Baloo 2"; font-weight:600; font-size:20px; background:color-mix(in srgb, var(--gc) 22%, transparent); padding:1px 8px; border-radius:8px; }
+.fb { margin-top:16px; padding:16px; border-radius:20px; background:var(--surface); border:1.5px solid var(--line); box-shadow:var(--shadow); display:flex; gap:14px; align-items:center; animation:up .3s ease-out; }
+@keyframes up { from{transform:translateY(12px);opacity:0} }
+.fb .pts { font-family:"Baloo 2"; font-weight:700; font-size:40px; color:var(--gc); line-height:1; min-width:70px; text-align:center; }
+.fb .pts small { display:block; font-size:12px; color:var(--muted); font-family:"Nunito"; font-weight:800; }
+.fb .tx { font-size:14.5px; line-height:1.45; font-weight:700; }
+.fb .tx b { font-family:"Baloo 2"; font-weight:600; }
+/* Results */
+.res { text-align:center; margin:20px 0 6px; }
+.res .n { font-family:"Baloo 2"; font-weight:700; font-size:78px; line-height:1; background:linear-gradient(90deg,#ff5d73,#6c4cff,#1fb6a6); -webkit-background-clip:text; background-clip:text; color:transparent; font-variant-numeric:tabular-nums; }
+.res .of { font-weight:800; color:var(--muted); }
+.rank { display:inline-block; margin-top:12px; font-family:"Baloo 2"; font-weight:600; font-size:22px; padding:8px 18px; border-radius:16px; background:var(--surface); border:1.5px solid var(--line); box-shadow:var(--shadow); }
+.rrow { display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:16px; background:var(--surface); border:1.5px solid var(--line); margin-top:8px; }
+.rrow .gicon { width:36px; height:36px; border-radius:11px; background:var(--gc); }
+.rrow .gicon svg { width:22px; height:22px; }
+.rrow .nm { font-family:"Baloo 2"; font-weight:600; font-size:17px; }
+.rrow .bar { flex:1; height:8px; border-radius:4px; background:var(--line); overflow:hidden; }
+.rrow .bar i { display:block; height:100%; background:var(--gc); border-radius:4px; }
+.rrow .sc { font-family:"Baloo 2"; font-weight:700; width:34px; text-align:right; }
+
+/* Intro */
+.intro { text-align:center; animation:up .3s ease-out; }
+.gicon.big { width:96px; height:96px; border-radius:30px; margin:0 auto 14px; background:var(--gc); box-shadow:0 7px 0 var(--gce); }
+.gicon.big svg { width:56px; height:56px; }
+.intro .no { font-size:13px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
+.intro h2 { margin:0; font-size:40px; font-weight:700; line-height:1.1; }
+.intro .lead { font-size:17px; font-weight:700; line-height:1.45; margin:10px auto 0; max-width:340px; }
+.steps { list-style:none; counter-reset:s; margin:22px 0 0; padding:8px 16px; background:var(--surface); border:1.5px solid var(--line); border-radius:22px; box-shadow:var(--shadow); animation:up .4s ease-out; }
+.steps li { counter-increment:s; display:flex; align-items:center; gap:12px; padding:11px 0; font-size:15px; font-weight:700; line-height:1.35; }
+.steps li + li { border-top:1.5px dashed var(--line); }
+.steps li::before { content:counter(s); flex-shrink:0; width:30px; height:30px; border-radius:50%; background:color-mix(in srgb, var(--gc) 20%, transparent); color:var(--gc); font-family:"Baloo 2"; font-weight:800; font-size:16px; display:flex; align-items:center; justify-content:center; }
+.steps b { font-family:"Baloo 2"; font-weight:700; color:var(--gc); }
+.btn.go { background:var(--gc); color:#fff; box-shadow:0 5px 0 var(--gce); font-size:21px; }
+.btn.go:active { box-shadow:0 1px 0 var(--gce); }
+.chip { display:flex; align-items:center; gap:7px; padding:5px 12px 5px 5px; border-radius:14px; border:1.5px solid var(--line); background:var(--surface); color:var(--fg); font-family:"Nunito"; font-weight:800; font-size:14px; cursor:pointer; }
+.chip .gicon { width:26px; height:26px; border-radius:9px; background:var(--gc); }
+.chip .gicon svg { width:16px; height:16px; }
+.subok { margin-top:18px; padding:14px 16px; border-radius:18px; background:color-mix(in srgb, var(--ok) 14%, var(--surface)); border:1.5px solid color-mix(in srgb, var(--ok) 40%, transparent); font-weight:700; font-size:14.5px; text-align:center; }
+.subok b { font-family:"Baloo 2"; font-weight:700; }
+.subok span { color:var(--muted); }
+.subok .two { display:flex; margin-top:10px; gap:8px; }
+.subok .two > div { flex:1; background:var(--surface); border-radius:14px; padding:8px 4px; }
+.subok .two small { display:block; font-size:11.5px; color:var(--muted); font-weight:800; }
+.subok .two b { font-size:22px; }
+.btnrow { display:flex; gap:10px; }
+.btnrow .btn { flex:1; }
+
+/* Skor tablosu */
+.lbtitle { font-family:"Baloo 2"; font-weight:700; font-size:22px; }
+.lbwrap { display:flex; flex-direction:column; }
+.tabs { display:flex; background:var(--surface2); border-radius:16px; padding:4px; gap:4px; }
+.tabs button { flex:1; border:0; background:transparent; color:var(--muted); font-family:"Baloo 2"; font-weight:700; font-size:17px; padding:9px; border-radius:12px; cursor:pointer; }
+.tabs button.on { background:var(--surface); color:var(--fg); box-shadow:0 2px 0 var(--line); }
+.gtabs { display:flex; gap:8px; overflow-x:auto; padding:12px 0 4px; scrollbar-width:none; }
+.gtabs .chip { flex-shrink:0; }
+.chip.on { background:var(--gc); color:#fff; border-color:var(--gc); }
+.chip.on .gicon { background:rgba(255,255,255,.25); }
+.lbsub { font-size:13px; font-weight:800; color:var(--muted); margin:10px 2px 8px; }
+.lblist { background:var(--surface); border:1.5px solid var(--line); border-radius:20px; overflow:hidden; max-height:52vh; overflow-y:auto; }
+.lbrow, .lbme { display:flex; align-items:center; gap:12px; padding:11px 16px; }
+.lbrow + .lbrow { border-top:1px solid var(--line); }
+.lbrow .rk, .lbme .rk { width:44px; font-family:"Baloo 2"; font-weight:700; font-size:16px; color:var(--muted); font-variant-numeric:tabular-nums; }
+.lbrow.top .rk { font-size:22px; }
+.lbrow .nk, .lbme .nk { flex:1; font-weight:800; font-size:15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.lbrow .sc, .lbme .sc { font-family:"Baloo 2"; font-weight:700; font-size:17px; font-variant-numeric:tabular-nums; }
+.lbme { margin-top:10px; border-radius:18px; background:#6c4cff; color:#fff; box-shadow:0 5px 0 #4f31d9; }
+.lbme .rk { color:rgba(255,255,255,.8); }
+.lbme .nk span { opacity:.75; font-weight:700; }
+.lbme.empty { justify-content:center; background:var(--surface2); color:var(--muted); box-shadow:none; font-weight:800; font-size:14px; padding:14px; }
+/* Masaüstü */
+@media (min-width: 820px) {
+  .app { max-width:800px; padding:28px 32px; }
+  .stage { aspect-ratio:16/10; }
+  .hero h1 { font-size:38px; }
+  .games { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; }
+  .games .gcard { flex-direction:column; align-items:flex-start; gap:10px; margin:0; padding:18px 16px 20px; min-height:200px; }
+  .games .gicon { width:58px; height:58px; border-radius:18px; }
+  .games .gicon svg { width:34px; height:34px; }
+  .games .gname { font-size:22px; margin-top:auto; }
+  .games .gnum { position:absolute; top:14px; right:14px; }
+  .btn, .answer { max-width:440px; margin-left:auto; margin-right:auto; }
+  .prompt { font-size:18px; }
+  .gtitle h2 { font-size:30px; }
+  .steps { max-width:560px; width:100%; margin-left:auto; margin-right:auto; }
+  .intro .lead { max-width:520px; font-size:19px; }
+  .intro h2 { font-size:48px; }
+  .fb .tx { font-size:16px; }
+  .res .n { font-size:96px; }
+}
+
+/* Ana sayfa: oynanmış oyun ve tamamlanmış gün */
+.gcard.done { opacity:.72; }
+.gcard .gnum.score { width:auto; padding:0 9px; border-radius:14px; }
+.daycard { text-align:center; padding:22px 16px; border-radius:24px; background:var(--surface); border:1.5px solid var(--line); box-shadow:var(--shadow); }
+.daycard .n { font-family:"Baloo 2"; font-weight:700; font-size:64px; line-height:1; background:linear-gradient(90deg,#ff5d73,#6c4cff,#1fb6a6); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.daycard .lbl { font-weight:800; color:var(--muted); font-size:13px; }
+.daycard .rank { margin-top:10px; }
+
+/* Yükleniyor / hata */
+.skel { height:44px; border-radius:12px; background:var(--surface2); margin:8px 16px; animation:skel 1.2s ease-in-out infinite; }
+@keyframes skel { 50% { opacity:.45; } }
+.err { padding:16px; text-align:center; font-weight:800; color:var(--muted); }
+.err .btn { margin-top:12px; }
+.subfail { margin-top:18px; padding:14px 16px; border-radius:18px; background:color-mix(in srgb, #e5484d 12%, var(--surface)); border:1.5px solid color-mix(in srgb, #e5484d 40%, transparent); font-weight:800; font-size:14.5px; text-align:center; }
+.subfail .btn { margin-top:10px; padding:11px; font-size:16px; }
