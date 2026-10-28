@@ -3,6 +3,7 @@ import { ICONS, UI, icon } from '../icons.js';
 import { $, gvars } from '../dom.js';
 import { gameBar, bindGameBar } from '../gamebar.js';
 import { layout } from '../../games/common.js';
+import { clock } from './twait.js';
 
 const INTRO = {
   nokta:  { lead: 'Ekranda bir anlığına noktalar belirecek. Saymaya vaktin olmayacak, göz kararı tahmin et!',
@@ -27,7 +28,8 @@ export function render(app, ctx, params) {
   const { id } = params;
   const { state, go } = ctx;
   const practice = !!params.practice;
-  const g = GAMES[id], t = practice ? ctx.practice : state.today(), text = INTRO[id];
+  const tour = params.tournament ? ctx.tournament : null;
+  const g = GAMES[id], t = practice ? ctx.practice : tour ?? state.today(), text = INTRO[id];
   const steps = id === 'renk' && layout().wide ? text.steps.map(s => s.replace('parmağını gezdir', 'fareyi sürükle')) : text.steps;
   const pos = t.set.indexOf(id);
   const label = pos >= 0 ? `Oyun ${pos + 1} / ${t.set.length}` : 'Deneme';
@@ -36,13 +38,21 @@ export function render(app, ctx, params) {
   app.innerHTML = `${gameBar(t, id)}
     <div class="intro">
       <div class="gicon big">${ICONS[id]}</div>
-      <div class="no">${practice ? `Antrenman · ${label}` : label}</div>
+      <div class="no">${practice ? `Antrenman · ${label}` : tour ? `Turnuva · ${label}` : label}</div>
       <h2>${g.ad}</h2>
       <p class="lead">${text.lead}</p>
     </div>
     <ol class="steps">${steps.map(s => `<li><span>${s}</span></li>`).join('')}</ol>
+    ${tour ? `<div class="ft">Kalan süre <b id="tl">${clock(tour.msLeft())}</b></div>` : ''}
     <button class="btn go" id="ready">Hazırım!</button>`;
 
+  if (tour) {
+    bindGameBar(state, () => { if (confirm('Turnuvadan ayrılmak istiyor musun?')) tour.leave(); });
+    $('ready').onclick = () => tour.startGame();
+    const timer = setInterval(() => { $('tl').textContent = clock(tour.msLeft()); }, 1000);
+    ctx.bag.add(() => clearInterval(timer));
+    return;
+  }
   bindGameBar(state, () => go('home'));
   $('ready').onclick = () => {
     if (!practice) state.startGame(id);

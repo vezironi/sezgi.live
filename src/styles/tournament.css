@@ -1,0 +1,66 @@
+/* Turnuva: giriş formu, lobi, bekleme, sonuç */
+.tgicon { background:#6c4cff; box-shadow:0 7px 0 #4f31d9; color:#fff; }
+.tform { margin-top:20px; }
+.tinput { width:100%; padding:15px 16px; border-radius:16px; border:1.5px solid var(--line); background:var(--surface); color:var(--fg);
+          font-family:"Baloo 2 Variable"; font-weight:600; font-size:20px; outline:none; }
+.tinput:focus { border-color:#6c4cff; }
+.tinput.sm { flex:1; min-width:0; padding:7px 10px; font-size:16px; border-radius:11px; }
+.terr { min-height:18px; margin-top:6px; font-size:13.5px; font-weight:800; color:#e5484d; }
+.btn:disabled { opacity:.5; cursor:default; transform:none; }
+
+.tcard { padding:12px 14px; border-radius:18px; background:var(--surface); border:1.5px solid var(--line); box-shadow:var(--shadow); }
+.tlbl { font-size:12px; font-weight:800; letter-spacing:.8px; text-transform:uppercase; color:var(--muted); margin:16px 2px 8px; }
+.tlbl small { text-transform:none; letter-spacing:0; font-weight:700; }
+.tlinkcard .tlbl { margin:0 0 6px; }
+.tlink { display:flex; align-items:center; gap:10px; }
+.tlink span { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-family:"Baloo 2 Variable"; font-weight:600; font-size:18px; color:#6c4cff; }
+:root[data-theme="dark"] .tlink span { color:#a08cff; }
+
+.plink { border:0; background:var(--surface2); color:var(--fg); font-family:"Nunito Variable"; font-weight:800; font-size:13px; padding:7px 11px; border-radius:11px; cursor:pointer; display:inline-flex; align-items:center; gap:5px; flex-shrink:0; }
+.plink.bad { color:#e5484d; }
+
+.plist { display:flex; flex-direction:column; gap:6px; }
+.prow { display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:14px; background:var(--surface); border:1.5px solid var(--line); flex-wrap:wrap; }
+.prow.me { border-color:color-mix(in srgb, #6c4cff 55%, var(--line)); }
+.pav { width:24px; height:24px; border-radius:50%; flex-shrink:0; background:hsl(var(--h) 75% 62%); }
+.pnm { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:800; font-size:15px; }
+.pnm small { color:var(--muted); font-weight:700; }
+.prow .terr { flex-basis:100%; margin:0; min-height:0; }
+.otag { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:800; padding:3px 8px; border-radius:10px; background:#fff1d6; color:#b86b00; }
+:root[data-theme="dark"] .otag { background:#3a2b10; color:#ffc35c; }
+.pst { font-size:13px; font-weight:800; color:var(--muted); display:inline-flex; align-items:center; gap:3px; }
+.pst.ok { color:var(--ok); }
+.pst.bad { color:#e5484d; }
+
+.tchips { display:flex; flex-wrap:wrap; gap:8px; }
+.tchips .chip:disabled { cursor:default; opacity:1; }
+.tchips .chip:not(.on):disabled { opacity:.55; }
+
+.twaitnote { margin-top:16px; display:flex; align-items:center; justify-content:center; gap:8px; font-weight:800; color:var(--muted); text-align:center; }
+.ic.spin { animation:spin 1s linear infinite; }
+
+.twbig { text-align:center; margin-bottom:14px; }
+.twbig .no { font-size:13px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
+.twbig .n { font-family:"Baloo 2 Variable"; font-weight:700; font-size:72px; line-height:1; color:var(--gc); font-variant-numeric:tabular-nums; }
+.twbig .n small { font-size:20px; color:var(--muted); }
+.twbig .twaitnote { margin-top:6px; }
+.intro .lead b { font-family:"Baloo 2 Variable"; font-variant-numeric:tabular-nums; }
+
+/* Sonuç */
+.lbrow.mine { background:color-mix(in srgb, #6c4cff 12%, var(--surface)); }
+.lbrow .nk small { color:var(--muted); font-weight:700; }
+.ttable { background:var(--surface); border:1.5px solid var(--line); border-radius:18px; padding:6px 8px; }
+.ttable table { width:100%; border-collapse:collapse; table-layout:fixed; font-variant-numeric:tabular-nums; }
+.ttable th, .ttable td { padding:7px 2px; text-align:center; font-family:"Baloo 2 Variable"; font-weight:600; font-size:15px; }
+.ttable th:first-child, .ttable td.tn { width:34%; text-align:left; padding-left:6px; }
+.ttable td.tn { font-family:"Nunito Variable"; font-weight:800; font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.ttable tbody tr + tr td { border-top:1px solid var(--line); }
+.ttable tr.mine td { color:#6c4cff; }
+:root[data-theme="dark"] .ttable tr.mine td { color:#a08cff; }
+.ttable .gicon { width:26px; height:26px; border-radius:8px; background:var(--gc); margin:0 auto; color:#fff; }
+.ttable .gicon svg { width:16px; height:16px; }
+.app[data-screen="tresults"] > :nth-child(2), .app[data-screen="tlobby"] > :nth-child(2) { margin-top:0; }
+
+/* Bağlantı koptuğunda */
+body[data-offline]::after { content:"Bağlantı sorunu, yeniden deneniyor…"; position:fixed; left:50%; bottom:16px; transform:translateX(-50%); z-index:10;
+  padding:9px 14px; border-radius:14px; background:var(--btn); color:var(--btnFg); font-weight:800; font-size:13px; box-shadow:var(--shadow); white-space:nowrap; }
