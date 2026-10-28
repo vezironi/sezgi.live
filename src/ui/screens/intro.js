@@ -38,7 +38,7 @@ export function render(app, ctx, params) {
   app.innerHTML = `${gameBar(t, id)}
     <div class="intro">
       <div class="gicon big">${ICONS[id]}</div>
-      <div class="no">${practice ? `Antrenman · ${label}` : tour ? `Turnuva · ${label}` : label}</div>
+      <div class="no">${practice ? 'Antrenman' : tour ? `Turnuva · ${label}` : label}</div>
       <h2>${g.ad}</h2>
       <p class="lead">${text.lead}</p>
     </div>
@@ -53,7 +53,7 @@ export function render(app, ctx, params) {
     ctx.bag.add(() => clearInterval(timer));
     return;
   }
-  bindGameBar(state, () => go('home'));
+  bindGameBar(state, () => go(practice ? 'practice' : 'home'));
   $('ready').onclick = () => {
     if (!practice) state.startGame(id);
     go('play', { id, practice });

@@ -55,10 +55,10 @@ const ctx = {
   go,
   bag,
   practice: null,
-  // Günün oyunlarını yeni sorularla, sıralamaya saymadan yeniden oynat.
-  startPractice() {
-    ctx.practice = createPractice(state.today().set);
-    go('intro', { id: ctx.practice.nextGame(), practice: true });
+  // Antrenman: seçilen oyunu yeni sorularla, sıralamaya saymadan üst üste oynat.
+  startPractice(id) {
+    ctx.practice = createPractice(id);
+    go('intro', { id, practice: true });
   },
   // Turnuva: adres /t/<KOD>; oturum sunucuyu sorgulayıp ekranları kendisi seçer.
   tournament: null,

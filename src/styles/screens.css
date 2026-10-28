@@ -181,3 +181,19 @@
 .app[data-screen="intro"] ~ .about,
 .app[data-screen="play"] ~ .about { display:none; }
 @media (min-width: 820px) { .about { padding-left:32px; padding-right:32px; } }
+/* Antrenman: oyun seçimi ve deneme sonrası istatistikler */
+.app[data-screen="practice"] > :nth-child(2) { margin-top:0; }
+.psub { font-size:14px; font-weight:700; color:var(--muted); margin:2px 2px 14px; }
+.pcard { width:100%; border:0; text-align:left; font:inherit; cursor:pointer; }
+.pcard:active { transform:translateY(3px); }
+.pstat { margin-left:auto; text-align:right; font-size:12px; font-weight:700; line-height:1.35; opacity:.95; flex-shrink:0; }
+.pstat b { font-family:"Baloo 2 Variable"; font-size:17px; }
+.prec { margin-top:12px; display:flex; align-items:center; justify-content:center; gap:6px; font-family:"Baloo 2 Variable"; font-weight:700; font-size:19px; color:var(--ok); animation:up .3s ease-out; }
+.pstats { display:flex; gap:8px; margin-top:12px; }
+.pstats div { flex:1; text-align:center; padding:9px 6px; border-radius:16px; background:var(--surface); border:1.5px solid var(--line); }
+.pstats b { display:block; font-family:"Baloo 2 Variable"; font-weight:700; font-size:24px; line-height:1.1; color:var(--gc); }
+.pstats span { font-size:11.5px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; }
+@media (min-width: 820px) {
+  .pgames { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+  .pgames .gcard { margin:0; }
+}

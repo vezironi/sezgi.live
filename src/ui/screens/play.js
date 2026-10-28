@@ -32,6 +32,19 @@ export function render(app, ctx, { id, practice = false, tournament = false }) {
     $('next').onclick = () => tour.release();
     $('next').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   };
+  // Antrenman: aynı oyunu yeni soruyla tekrar oyna; en iyi puan ve ortalama bu cihazda tutulur.
+  const practiceEnd = (score, html) => {
+    const s = session.finish(id, score);
+    $('fb').innerHTML = `<div class="fb"><div class="pts">${score}<small>puan</small></div><div class="tx">${html}</div></div>
+      ${s.record && s.count > 1 ? `<div class="prec">${icon(UI.trophy, { size: 18, stroke: 2.4 })} Yeni rekor!</div>` : ''}
+      <div class="pstats"><div><b>${s.best}</b><span>En iyi</span></div><div><b>${s.avg}</b><span>Ortalama</span></div><div><b>${s.count}</b><span>Deneme</span></div></div>
+      <button class="btn go" id="next">${icon(UI.replay)} Tekrar oyna</button>
+      <button class="btn alt" id="pick">Başka oyun seç</button>`;
+    $('next').onclick = () => { session.again(); go('play', { id, practice: true }); };
+    $('pick').onclick = () => go('practice');
+    $('next').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  };
+
   if (tour) {
     later(bag, () => {
       if (answered) return;
@@ -46,8 +59,9 @@ export function render(app, ctx, { id, practice = false, tournament = false }) {
       if (!answered) { answered = true; tour.finish(0); } else tour.release();
       return;
     }
+    if (practice) { go('practice'); return; }
     // Günlük oyunun ortasında çıkmak, sayfayı kapatmakla aynı sayılır: oyun 0 puan. Antrenmanda kural yok.
-    if (!practice && !answered) {
+    if (!answered) {
       if (!confirm('Çıkarsan bu oyun 0 puan sayılır. Emin misin?')) return;
       state.finishGame(id, 0);
     }
@@ -66,15 +80,12 @@ export function render(app, ctx, { id, practice = false, tournament = false }) {
       answered = true;
       const score = PUZZLES[id].score(puzzle, answer);
       if (tour) { tourEnd(score, html); return; }
-      let next;
-      if (practice) { session.finish(id, score); next = session.nextGame(); }
-      else { state.finishGame(id, score); next = state.nextGame(); }
+      if (practice) { practiceEnd(score, html); return; }
+      state.finishGame(id, score);
+      const next = state.nextGame();
       $('fb').innerHTML = `<div class="fb"><div class="pts">${score}<small>puan</small></div><div class="tx">${html}</div></div>
         <button class="btn" id="next">${next ? `Devam ${icon(UI.next)}` : 'Sonucu gör'}</button>`;
-      $('next').onclick = () => {
-        if (next) go('intro', { id: next, practice });
-        else go(practice ? 'practice' : 'results');
-      };
+      $('next').onclick = () => (next ? go('intro', { id: next }) : go('results'));
       $('next').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     },
   });

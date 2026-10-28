@@ -53,13 +53,13 @@ export function render(app, ctx) {
       </div>`).join('')}</div>
     <div id="sub"></div>
     <div class="btnrow"><button class="btn" id="cp">${icon(UI.share)} Paylaş</button><button class="btn alt" id="lb2">${icon(UI.trophy)} Sıralama</button></div>
-    <button class="btn alt" id="again">${icon(UI.replay)} Tekrar oyna <small class="btn-note">· sıralamaya sayılmaz</small></button>
+    <button class="btn alt" id="again">${icon(UI.target)} Antrenman <small class="btn-note">· sıralamaya sayılmaz</small></button>
     ${countdownFooter()}`;
 
   bindTopBar(ctx, 'results');
   startCountdown(ctx);
   $('lb2').onclick = () => go('board', { back: 'results' });
-  $('again').onclick = ctx.startPractice;
+  $('again').onclick = () => go('practice');
 
   // Puan sayarak yükselir, çubuklar dolar.
   const tn = $('tn'), t0 = performance.now();

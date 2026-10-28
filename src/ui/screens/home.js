@@ -25,7 +25,8 @@ export function render(app, ctx) {
   const t = state.today();
   const complete = state.isComplete();
   const started = Object.keys(t.scores).length > 0;
-  const tourButton = `<button class="btn alt" id="tour">${icon(UI.users)} Arkadaşlarla turnuva</button>`;
+  const extraButtons = `<button class="btn alt" id="train">${icon(UI.target)} Antrenman</button>
+    <button class="btn alt" id="tour">${icon(UI.users)} Arkadaşlarla turnuva</button>`;
 
   const cards = t.set.map((id, i) => {
     const g = GAMES[id], done = id in t.scores;
@@ -41,13 +42,11 @@ export function render(app, ctx) {
         const day = dayScore(t.set.map(id => t.scores[id]));
         return `<div class="daycard"><div class="lbl">Bugünün puanın</div><div class="n">${day}</div><div class="lbl">/ 100</div><div class="rank">${rankFor(day)}</div></div>
           <button class="btn" id="go">Sonucu gör</button>
-          <button class="btn alt" id="again">${icon(UI.replay)} Tekrar oyna</button>
-          <div class="ft">Tekrar oynadıkların sıralamaya sayılmaz</div>
-          ${tourButton}`;
+          ${extraButtons}`;
       })()
     : `<div class="games">${cards}</div>
        <button class="btn" id="go">${started ? 'Devam et' : 'Başla'}</button>
-       ${tourButton}`;
+       ${extraButtons}`;
 
   app.innerHTML = `${topBar(state)}
     <div class="hero"><div class="no">#${puzzleNumber(t.date)} · ${formatLongDate(t.date)}</div><h1>${complete ? 'Bugünü tamamladın!' : 'Bugünün 5 oyunu'}</h1></div>
@@ -56,7 +55,7 @@ export function render(app, ctx) {
 
   bindTopBar(ctx, 'home');
   $('go').onclick = () => (complete ? go('results') : go('intro', { id: state.nextGame() }));
-  if (complete) $('again').onclick = ctx.startPractice;
+  $('train').onclick = () => go('practice');
   $('tour').onclick = () => go('tjoin', { create: true });
   startCountdown(ctx);
 }

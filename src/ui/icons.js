@@ -2,7 +2,7 @@
 import {
   Grip, DraftingCompass, Timer, Palette, Crosshair, Orbit, AudioLines, Ruler,
   Flame, Trophy, Moon, Sun, X, ArrowLeft, ArrowRight, CircleCheck, Share2, RotateCcw,
-  Volume2, Medal, CalendarDays, Star, LoaderCircle, CircleAlert, House, Users, Copy, Crown, LogOut,
+  Volume2, Medal, CalendarDays, Star, LoaderCircle, CircleAlert, House, Users, Copy, Crown, LogOut, Target,
 } from 'lucide';
 import { icon } from './icon.js';
 
@@ -23,7 +23,7 @@ export const UI = {
   flame: Flame, trophy: Trophy, moon: Moon, sun: Sun, close: X, back: ArrowLeft, next: ArrowRight,
   check: CircleCheck, share: Share2, replay: RotateCcw, sound: Volume2, medal: Medal,
   calendar: CalendarDays, star: Star, loader: LoaderCircle, alert: CircleAlert, home: House,
-  users: Users, copy: Copy, crown: Crown, logout: LogOut,
+  users: Users, copy: Copy, crown: Crown, logout: LogOut, target: Target,
 };
 
 export { icon };
