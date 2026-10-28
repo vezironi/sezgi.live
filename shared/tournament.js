@@ -17,7 +17,7 @@ export const SUBMIT_GRACE_MS = 3000; // ağ gecikmesi payı
 export const TRANSITION_MS = 2500;   // "Herkes bitirdi!" anı
 export const LOBBY_IDLE_MS = 60000;
 export const GAME_IDLE_MS = 20000;
-export const OWNER_IDLE_MS = 30000;
+export const OWNER_IDLE_MS = 120000; // sahip linki paylaşırken (WhatsApp vb.) sekmesi donabilir
 
 const CONTROL = /[\u0000-\u001f\u007f]/;
 

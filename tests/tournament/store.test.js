@@ -43,3 +43,13 @@ test('bozuk kayıtla boş başlar', () => {
   assert.equal(s.pid('K7QXA'), null);
   assert.equal(s.lastName(), '');
 });
+
+test('bekleyen puan saklanır ve silinir', () => {
+  const s = createTourStore(safeLocalStorage(memory()));
+  assert.equal(s.pending('K7QXA'), null);
+  s.setPending('K7QXA', { no: 1, step: 0, score: 80 });
+  assert.deepEqual(createTourStore(safeLocalStorage({ getItem: () => null, setItem() {}, removeItem() {} })).pending('K7QXA'), null);
+  assert.deepEqual(s.pending('K7QXA'), { no: 1, step: 0, score: 80 });
+  s.clearPending('K7QXA');
+  assert.equal(s.pending('K7QXA'), null);
+});

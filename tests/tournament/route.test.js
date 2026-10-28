@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { screenFor } from '../../src/tournament/route.js';
+import { screenFor, isStale, pollDelay } from '../../src/tournament/route.js';
 
 const me = { id: 'm1', name: 'Ben', owner: false };
 const base = { code: 'K7QXA', now: 10000, kicked: false, me, games: ['nokta', 'aci'], players: [], round: null };
@@ -48,4 +48,32 @@ test('başlatılmış oyun: oynuyorsan oyun ekranı, yenilediysen terk edilmiş 
 test('eski turdan kalan başlatma kaydı yok sayılır, tanıtım açılır', () => {
   assert.deepEqual(screenFor(playing(), { started: { no: 0, step: 0 }, playing: false }), { name: 'intro', params: { id: 'nokta', tournament: true } });
   assert.deepEqual(screenFor(playing(), idle), { name: 'intro', params: { id: 'nokta', tournament: true } });
+});
+
+test('bekleyen (gönderilemeyen) puan varken aynı soruya dönülmez', () => {
+  const pending = { no: 1, step: 0, score: 80 };
+  assert.deepEqual(screenFor(playing(), { started: null, playing: false, pending }), { name: 'twait', params: { step: 0 } });
+  // Eski adımın bekleyen puanı yeni adımı etkilemez.
+  assert.deepEqual(screenFor(playing({ step: 1 }), { started: null, playing: false, pending }).name, 'intro');
+});
+
+test('isStale: daha eski sunucu zamanlı görünüm uygulanmaz', () => {
+  assert.equal(isStale(null, { now: 5 }), false);
+  assert.equal(isStale(5000, { now: 4000 }), true);
+  assert.equal(isStale(5000, { now: 5000 }), false);
+  assert.equal(isStale(5000, { now: 6000 }), false);
+});
+
+test('pollDelay: atılınca durur, gizli lobide durur, uzun süre değişmeyen lobide seyrekleşir', () => {
+  const lobby = { ...base, phase: 'lobby' };
+  const o = { playing: false, hidden: false, idleMs: 0 };
+  assert.equal(pollDelay({ ...lobby, kicked: true }, o), null);
+  assert.equal(pollDelay(lobby, o), 1500);
+  assert.equal(pollDelay(lobby, { ...o, hidden: true }), null);
+  assert.equal(pollDelay({ ...base, phase: 'results', round: round() }, { ...o, hidden: true }), null);
+  assert.equal(pollDelay(lobby, { ...o, idleMs: 10 * 60000 + 1 }), 60000);
+  assert.equal(pollDelay(playing(), { ...o, playing: true }), 5000);
+  assert.equal(pollDelay(playing(), { ...o, hidden: true }), 5000);
+  assert.equal(pollDelay(playing(), o), 1500);
+  assert.equal(pollDelay({ ...playing(), me: null }, o), 5000);
 });

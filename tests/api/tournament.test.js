@@ -156,9 +156,9 @@ test('again yeni tur açar, lobby lobiye döner', async () => {
   assert.equal(back.round, null);
 });
 
-test('sahip 31 sn sessiz kalırsa sahiplik devredilir', async () => {
+test('sahip 2 dakikadan uzun sessiz kalırsa sahiplik devredilir', async () => {
   const { call, clock, code, pids } = await lobby(2);
-  clock.t += 31000;
+  clock.t += 121000;
   const v = (await call({ action: 'state', code, pid: pids[1] })).body.view;
   assert.equal(v.me.owner, true);
 });

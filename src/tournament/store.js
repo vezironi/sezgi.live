@@ -9,16 +9,21 @@ export function createTourStore(storage = safeLocalStorage()) {
   if (typeof data !== 'object' || Array.isArray(data)) data = {};
   data.pids ??= {};
   data.started ??= {};
+  data.pending ??= {};
   const save = () => storage.setItem(KEY, JSON.stringify(data));
 
   return {
     pid: code => data.pids[code] ?? null,
     setPid(code, pid) { data.pids[code] = pid; save(); },
-    forget(code) { delete data.pids[code]; delete data.started[code]; save(); },
+    forget(code) { delete data.pids[code]; delete data.started[code]; delete data.pending[code]; save(); },
     lastName: () => (typeof data.name === 'string' ? data.name : ''),
     setLastName(name) { data.name = name; save(); },
     started: code => data.started[code] ?? null,
     setStarted(code, s) { data.started[code] = s; save(); },
     clearStarted(code) { delete data.started[code]; save(); },
+    // Gönderilemeyen puan: bağlantı dönünce yeniden gönderilir, bu sürede aynı soruya dönülmez.
+    pending: code => data.pending[code] ?? null,
+    setPending(code, p) { data.pending[code] = p; save(); },
+    clearPending(code) { delete data.pending[code]; save(); },
   };
 }

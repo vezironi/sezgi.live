@@ -3,18 +3,17 @@
 import { tournament } from '../api.js';
 import { puzzleSeed, SUBMIT_GRACE_MS } from '../../shared/tournament.js';
 import { createTourStore } from './store.js';
-import { screenFor } from './route.js';
+import { screenFor, isStale, pollDelay } from './route.js';
 
-const POLL_MS = 1500;
-const SLOW_MS = 5000; // arka plandaki sekme ve oyun sırasındaki "buradayım" sinyali
 const OFFLINE_AFTER = 3;
 
 export function createSession(ctx, code) {
   const store = createTourStore();
   let pid = store.pid(code);
-  let view = null, offset = 0, key = null;
+  let view = null, offset = 0, key = null, lastNow = null;
   let timer = null, wake = null, stopped = false, failures = 0;
-  let playing = false, hold = false;
+  let playing = false, hold = false, submitting = null;
+  let changedAt = Date.now(), lastShape = '';
   const listeners = new Set();
 
   const serverNow = () => Date.now() + offset;
@@ -22,7 +21,7 @@ export function createSession(ctx, code) {
 
   function route() {
     if (!view || stopped) return;
-    const target = screenFor(view, { started: store.started(code), playing });
+    const target = screenFor(view, { started: store.started(code), playing, pending: store.pending(code) });
     // Puan kartı gösterilirken bekleme ekranına zorla geçilmez; sıradaki oyun başlarsa geçilir.
     const held = hold && target.name === 'twait';
     const k = held ? key : `${target.name}:${JSON.stringify(target.params)}:${view.round?.no ?? ''}`;
@@ -34,8 +33,13 @@ export function createSession(ctx, code) {
   }
 
   function apply(v) {
+    // Sorgu ile eylem yanıtları farklı sırayla gelebilir: sunucuda daha önce hesaplanmış görünüm ekranı geri sarmasın.
+    if (isStale(lastNow, v)) return;
+    lastNow = v.now;
     view = v;
     offset = v.now - Date.now();
+    const shape = JSON.stringify({ ...v, now: 0 });
+    if (shape !== lastShape) { lastShape = shape; changedAt = Date.now(); }
     clearTimeout(wake);
     // Geçiş bitince herkes aynı anda sonraki ekrana geçsin: bir sonraki sorguyu beklemeden yerelde yeniden seç.
     const r = v.round;
@@ -54,14 +58,30 @@ export function createSession(ctx, code) {
 
   function schedule(ms) {
     clearTimeout(timer);
-    if (!stopped) timer = setTimeout(tick, ms ?? (playing || document.hidden ? SLOW_MS : POLL_MS));
+    if (stopped) return;
+    const delay = ms ?? (view ? pollDelay(view, { playing, hidden: document.hidden, idleMs: Date.now() - changedAt }) : 0);
+    if (delay !== null) timer = setTimeout(tick, delay);
+  }
+
+  // Bağlantı yüzünden gönderilemeyen puan her sorguda yeniden denenir; sunucu reddederse (süre doldu vb.) bırakılır.
+  async function flushPending() {
+    const p = store.pending(code);
+    if (!p || submitting) return;
+    if (p.no !== round()?.no) { store.clearPending(code); return; }
+    try {
+      await act('submit', { step: p.step, score: p.score });
+      store.clearPending(code);
+    } catch (e) {
+      if (e.status !== 0) store.clearPending(code);
+      throw e;
+    }
   }
 
   async function tick() {
     if (stopped) return;
     try {
       if (playing && pid) await tournament('ping', { code, pid });
-      else await act('state');
+      else { await flushPending(); await act('state'); }
       failures = 0;
       setOffline(false);
     } catch (e) {
@@ -76,7 +96,7 @@ export function createSession(ctx, code) {
     schedule();
   }
 
-  const onVisible = () => { if (!document.hidden) schedule(0); };
+  const onVisible = () => { if (!document.hidden) { changedAt = Date.now(); schedule(0); } };
   document.addEventListener('visibilitychange', onVisible);
 
   function stop() {
@@ -139,24 +159,31 @@ export function createSession(ctx, code) {
     // Puan kartı açıkken bekleme ekranına geçişi tutar; release ile bırakılır.
     hold() { hold = true; },
     release() { hold = false; route(); },
-    async finish(score) {
+    // Puan önce "bekleyen" olarak kaydedilir: ağ koparsa sonraki sorgularda yeniden gönderilir ve
+    // oyuncu aynı soruya dönmez. Aynı anda ikinci bir gönderim başlatılmaz (0 gerçek puanı ezmesin).
+    finish(score) {
+      if (submitting) return submitting;
       const r = round();
       const s = store.started(code) ?? { no: r.no, step: r.step };
-      playing = false;
-      schedule();
-      for (let attempt = 0; ; attempt++) {
-        try {
-          if (s.no === r.no) await act('submit', { step: s.step, score });
-          break;
-        } catch (e) {
-          // Süre doldu / zaten gönderildi: sunucunun kararı geçerli. Eski görünümle aynı soruya dönülmesin diye
-          // yeniden seçim taze görünümü bekler.
-          if (e.status !== 0 || attempt >= 2) { store.clearStarted(code); schedule(0); return; }
-          await new Promise(res => setTimeout(res, 800));
-        }
-      }
+      store.setPending(code, { no: s.no, step: s.step, score });
       store.clearStarted(code);
-      route();
+      playing = false;
+      submitting = (async () => {
+        for (let attempt = 0; ; attempt++) {
+          try {
+            await act('submit', { step: s.step, score });
+            store.clearPending(code);
+            return true;
+          } catch (e) {
+            // Süre doldu / zaten gönderildi: sunucunun kararı geçerli. Ekran eski görünümle aynı soruya
+            // dönmesin diye yeniden seçim taze görünümü bekler.
+            if (e.status !== 0) { store.clearPending(code); return false; }
+            if (attempt >= 2) return false; // bekleyen kalır, sorgu döngüsü yeniden dener
+            await new Promise(res => setTimeout(res, 800));
+          }
+        }
+      })().then(ok => { submitting = null; if (ok) route(); schedule(ok ? undefined : 0); });
+      return submitting;
     },
   };
   return session;

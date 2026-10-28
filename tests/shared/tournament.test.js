@@ -120,7 +120,14 @@ test('pickOwner: aktif sahip kalır, pasifse en eski aktif oyuncu', () => {
   const now = 100000;
   const players = [{ pid: 'o', joinedAt: 1 }, { pid: 'x', joinedAt: 3 }, { pid: 'y', joinedAt: 2 }];
   assert.equal(pickOwner(players, { o: now, x: now, y: now }, 'o', now), 'o');
-  assert.equal(pickOwner(players, { o: now - 31000, x: now, y: now }, 'o', now), 'y');
+  assert.equal(pickOwner(players, { o: now - 121000, x: now, y: now }, 'o', now), 'y');
   assert.equal(pickOwner(players, { x: now }, 'gone', now), 'x');
   assert.equal(pickOwner(players, {}, 'o', now), null);
+});
+
+test('pickOwner: sahip paylaşım için 2 dakikaya kadar uzaklaşabilir', () => {
+  const now = 1_000_000;
+  const players = [{ pid: 'o', joinedAt: 1 }, { pid: 'x', joinedAt: 2 }];
+  assert.equal(pickOwner(players, { o: now - 90000, x: now }, 'o', now), 'o');
+  assert.equal(pickOwner(players, { o: now - 121000, x: now }, 'o', now), 'x');
 });
