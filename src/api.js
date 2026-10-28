@@ -48,3 +48,11 @@ export function getBoard(type, { game, date } = {}) {
 export function getMe(token, date) {
   return call('/api/me?' + new URLSearchParams({ date }), { headers: { 'x-sezgi-token': token } });
 }
+
+export function tournament(action, body = {}) {
+  return call('/api/turnuva', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ action, ...body }),
+  });
+}
