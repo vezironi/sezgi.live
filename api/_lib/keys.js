@@ -1,7 +1,7 @@
 // Redis anahtarları ve yaşam süreleri.
 const DAY = 86400;
 
-export const TTL = { day: 8 * DAY, week: 15 * DAY, rl: DAY };
+export const TTL = { day: 8 * DAY, week: 15 * DAY, rl: DAY, tour: DAY };
 
 export const keys = {
   id: token => `id:${token}`,
@@ -12,4 +12,7 @@ export const keys = {
   game: (date, id) => `lb:game:${date}:${id}`,
   rl: (ip, date) => `rl:reg:${ip}:${date}`,
   rlMinute: (ip, minute) => `rl:regm:${ip}:${minute}`,
+  tour: code => `t:${code}`,
+  rlTour: (ip, date) => `rl:tour:${ip}:${date}`,
+  rlTourMinute: (ip, minute) => `rl:tourm:${ip}:${minute}`,
 };

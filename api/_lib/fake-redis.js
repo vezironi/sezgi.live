@@ -11,7 +11,9 @@ function parseBound(v, isMin) {
 export function createFakeRedis() {
   const strings = new Map();
   const zsets = new Map();
+  const hashes = new Map();
   const zset = key => { if (!zsets.has(key)) zsets.set(key, new Map()); return zsets.get(key); };
+  const hash = key => { if (!hashes.has(key)) hashes.set(key, new Map()); return hashes.get(key); };
 
   const api = {
     async get(key) { return strings.has(key) ? strings.get(key) : null; },
@@ -20,7 +22,7 @@ export function createFakeRedis() {
       strings.set(key, value);
       return 'OK';
     },
-    async del(key) { const had = strings.delete(key) || zsets.delete(key); return had ? 1 : 0; },
+    async del(key) { const had = strings.delete(key) || zsets.delete(key) || hashes.delete(key); return had ? 1 : 0; },
     async incr(key) { const v = Number(strings.get(key) ?? 0) + 1; strings.set(key, v); return v; },
     async expire() { return 1; },
     async zadd(key, ...args) {
@@ -52,6 +54,16 @@ export function createFakeRedis() {
       const slice = entries.slice(start, end + 1);
       return opts.withScores ? slice.flatMap(([m, s]) => [m, s]) : slice.map(([m]) => m);
     },
+    async hset(key, obj) {
+      const h = hash(key);
+      let added = 0;
+      for (const [f, v] of Object.entries(obj)) { if (!h.has(f)) added++; h.set(f, v); }
+      return added;
+    },
+    async hsetnx(key, field, value) { const h = hash(key); if (h.has(field)) return 0; h.set(field, value); return 1; },
+    async hget(key, field) { const h = hashes.get(key); return h && h.has(field) ? h.get(field) : null; },
+    async hgetall(key) { const h = hashes.get(key); return h && h.size ? Object.fromEntries(h) : null; },
+    async hdel(key, ...fields) { const h = hashes.get(key); let n = 0; for (const f of fields) if (h?.delete(f)) n++; return n; },
     pipeline() {
       const queue = [];
       const p = {};

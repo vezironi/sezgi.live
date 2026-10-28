@@ -175,3 +175,6 @@ export function makeMe({ redis, now }) {
     return json(await ranksFor(redis, nick, date), 200, { 'cache-control': 'private, no-store' });
   };
 }
+
+// Turnuva modu ayrı dosyada; yerel geliştirme sunucusu tüm handler fabrikalarını buradan yükler.
+export { makeTournament } from './tournament.js';

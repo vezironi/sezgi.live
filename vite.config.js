@@ -5,6 +5,7 @@ const ROUTES = {
   '/api/score': ['makeScore', 'POST'],
   '/api/board': ['makeBoard', 'GET'],
   '/api/me': ['makeMe', 'GET'],
+  '/api/turnuva': ['makeTournament', 'POST'],
 };
 
 // Yerel geliştirme: /api/* isteklerini Vercel handler'larına yönlendirir.
