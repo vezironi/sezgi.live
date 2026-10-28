@@ -19,7 +19,7 @@ const INTRO = {
   yorunge: { lead: 'Bir top fırlatılacak ama yolun yarısında görünmez olacak. Yerçekimini gözünle hesapla!',
             steps: ['Dokununca top kayalıktan fırlatılır', 'Havada bir noktada <b>kaybolur</b>', 'Yere düşeceği yere dokun, ne kadar yakınsa o kadar puan'] },
   ritim:  { lead: 'Kafanda bir metronom var mı? Tempoyu sesi duymadan korumaya çalış.',
-            steps: [`${icon(UI.sound, { size: 18, cls: 'inl' })} <b>Sesini aç</b>, 4 vuruş duyacaksın, onlara eşlik et`, 'Ses kesilince aynı tempoyla <b>8 kez</b> daha dokun', 'Vuruşlara ne kadar denk gelirsen o kadar puan'] },
+            steps: [`${icon(UI.sound, { size: 18, cls: 'inl' })} <b>Sesini aç</b>, Başlat'a basınca ritim çalmaya başlar`, 'Ritme <b>4 kez</b> dokunarak eşlik et, sonra ses kesilir', 'Sessizce aynı tempoyla <b>8 kez</b> daha dokun, vuruşlara ne kadar denk gelirsen o kadar puan'] },
   oran:   { lead: 'Cetvel yok, sadece gözün var. Bir çizgide istenen kesri bulabilir misin?',
             steps: ['Çizginin bir ucu <b>başlangıç</b> olarak işaretli', 'Başlangıçtan istenen kesir kadar uzaktaki noktayı bul', 'İşaretçiyi sürükle, <b>bıraktığın an</b> cevabın kaydedilir'] },
 };

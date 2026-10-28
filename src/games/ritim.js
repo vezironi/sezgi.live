@@ -1,21 +1,22 @@
 import { later } from './common.js';
-import { REF_BEATS, FREE_BEATS } from '../logic/puzzles/ritim.js';
+import { REF_BEATS, FREE_BEATS, splitTaps } from '../logic/puzzles/ritim.js';
 import { UI, icon } from '../ui/icons.js';
 
-export const prompt = () => 'İlk <strong>4 vuruşu</strong> dinle ve eşlik et. Ses kesilince aynı tempoyla <strong>8 kez</strong> daha dokun.';
+export const prompt = () => 'Ritme <strong>4 kez</strong> dokunarak eşlik et. Ses kesilince aynı tempoyla <strong>8 kez</strong> daha dokun.';
 
 const LEAD_MS = 600;
+const LOOKAHEAD_S = 0.12; // ses saatinde ne kadar ilerisi planlanır; ses kesilince en fazla bu kadarı iptal edilir
 
 export function mount({ stage, puzzle, onAnswer, bag }) {
   const I = 60000 / puzzle.bpm;
-  let actx = null, tStart = 0, phase = 'ready';
-  const taps = [];
+  let actx = null, tStart = 0, a0 = 0, phase = 'ready';
+  let nextBeat = 0, stopAt = Infinity; // stopAt: son çalınacak vuruş (4. eşlik dokunuşunda belirlenir)
+  const taps = [], voices = [];
   stage.innerHTML = `<button class="timer-btn" id="b">Başlat</button>
     <div class="beats" id="bt">${'<i></i>'.repeat(FREE_BEATS)}</div>
     <div class="hint" id="hn">${icon(UI.sound, { size: 15, cls: 'inl' })} Sesin açık olsun · Bilgisayarda boşluk tuşu da olur</div>`;
   const b = stage.querySelector('#b'), dots = [...stage.querySelectorAll('#bt i')], hint = stage.querySelector('#hn');
   const pulse = cls => { b.classList.remove(cls); void b.offsetWidth; b.classList.add(cls); };
-  const freeTaps = () => taps.filter(x => x > tStart + (REF_BEATS - 0.5) * I);
 
   const blip = (when, accent) => {
     const o = actx.createOscillator(), g = actx.createGain();
@@ -27,16 +28,30 @@ export function mount({ stage, puzzle, onAnswer, bag }) {
     o.connect(g).connect(actx.destination);
     o.start(when);
     o.stop(when + 0.1);
+    return g;
   };
 
-  const finish = () => {
+  // Metronom durana kadar vuruşları kısa aralıklarla ses saatinde planlar; görsel nabız aynı ızgaraya bağlı.
+  const schedule = () => {
+    while (nextBeat <= stopAt && a0 + (nextBeat * I) / 1000 < actx.currentTime + LOOKAHEAD_S) {
+      const k = nextBeat++;
+      voices.push({ k, g: blip(a0 + (k * I) / 1000, k % 4 === 0) });
+      later(bag, () => { if (k <= stopAt) pulse('beat'); }, tStart + k * I - performance.now());
+    }
+  };
+
+  const stopSound = beat => {
+    stopAt = beat;
+    for (const v of voices) if (v.k > beat) v.g.disconnect(); // planlanmış ama çalınmaması gereken vuruşlar
+    hint.textContent = 'Ses kesildi, aynı tempoyla devam et!';
+  };
+
+  const finish = offsets => {
     phase = 'done';
     b.disabled = true;
-    const free = freeTaps().slice(0, FREE_BEATS);
-    const offsets = free.map((x, j) => x - (tStart + (REF_BEATS + j) * I));
     const mean = offsets.reduce((a, o) => a + Math.abs(o), 0) / offsets.length;
-    const intervals = free.slice(1).map((x, j) => x - free[j]);
-    const pct = Math.round((I / (intervals.reduce((a, c) => a + c, 0) / intervals.length) - 1) * 100);
+    const avgInterval = I + (offsets[offsets.length - 1] - offsets[0]) / (offsets.length - 1);
+    const pct = Math.round((I / avgInterval - 1) * 100);
     b.innerHTML = `${Math.round(mean)}<br><span style="font-size:16px">ms sapma</span>`;
     const tempo = Math.abs(pct) < 2 ? 'Temponu çok iyi korudun!' : `Temponu <b>%${Math.abs(pct)}</b> ${pct > 0 ? 'hızlandırdın' : 'yavaşlattın'}.`;
     onAnswer({ offsets }, `Tempo <b>${puzzle.bpm} BPM</b>. Ortalama sapman <b>${Math.round(mean)} ms</b>. ${tempo}`);
@@ -55,26 +70,31 @@ export function mount({ stage, puzzle, onAnswer, bag }) {
     begin();
   };
 
-  // Referans vuruşlar ses saatinde planlanır; ızgara aynı ana performance.now() ile bağlanır.
+  // Vuruşlar ses saatinde planlanır; ızgara aynı ana performance.now() ile bağlanır. Metronom oyuncu 4 kez eşlik edene kadar susmaz.
   const begin = () => {
-    const a0 = actx.currentTime + LEAD_MS / 1000;
-    for (let k = 0; k < REF_BEATS; k++) blip(a0 + (k * I) / 1000, k === 0);
+    a0 = actx.currentTime + LEAD_MS / 1000;
     // Ses çıkış gecikmesi kadar ızgarayı kaydır (özellikle mobil/Bluetooth).
     tStart = performance.now() + LEAD_MS + (actx.outputLatency || actx.baseLatency || 0) * 1000;
     phase = 'run';
     b.textContent = 'Dokun';
-    hint.textContent = 'Dinle ve eşlik et…';
-    for (let k = 0; k < REF_BEATS; k++) later(bag, () => pulse('beat'), LEAD_MS + k * I);
-    later(bag, () => { hint.textContent = 'Ses kesildi, devam et!'; }, LEAD_MS + (REF_BEATS - 0.5) * I);
+    hint.textContent = `Ritme eşlik et · 0/${REF_BEATS}`;
+    schedule();
+    const timer = setInterval(() => { if (nextBeat <= stopAt) schedule(); }, 25);
+    bag.add(() => clearInterval(timer));
   };
 
   const tap = () => {
     if (phase !== 'run') return;
     taps.push(performance.now());
     pulse('hit');
-    const n = freeTaps().length;
-    dots.forEach((el, i) => el.classList.toggle('on', i < n));
-    if (n >= FREE_BEATS) finish();
+    const { stopBeat, offsets } = splitTaps(taps, tStart, I);
+    if (stopBeat === null) {
+      hint.textContent = `Ritme eşlik et · ${taps.filter(x => x >= tStart - I / 2).length}/${REF_BEATS}`;
+      return;
+    }
+    if (stopAt === Infinity) stopSound(stopBeat);
+    dots.forEach((el, i) => el.classList.toggle('on', i < offsets.length));
+    if (offsets.length >= FREE_BEATS) finish(offsets);
   };
 
   // Başlatma click ile (iOS ses kilidi), vuruşlar pointerdown ile (en düşük gecikme).
